@@ -149,6 +149,7 @@
       padding: 18px 22px;
       gap: 16px;
       overflow: hidden;
+      position: relative;
     }
 
     .main-header {
@@ -188,6 +189,25 @@
       box-shadow: 0 0 8px var(--success);
     }
 
+    .edit-button {
+      border-radius: 999px;
+      border: 1px solid rgba(129, 140, 248, 0.7);
+      background: radial-gradient(circle at top left, rgba(129, 140, 248, 0.3), transparent 60%);
+      color: #e5e7eb;
+      padding: 6px 12px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(79, 70, 229, 0.5);
+      margin-left: 10px;
+    }
+
+    .edit-button span.icon {
+      font-size: 14px;
+    }
+
     .content {
       flex: 1;
       display: flex;
@@ -197,7 +217,6 @@
       padding-bottom: 10px;
     }
 
-    /* Dashboard layouts */
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -279,7 +298,6 @@
       background: currentColor;
     }
 
-    /* Tables */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -384,7 +402,138 @@
       border-radius: var(--radius-md);
     }
 
-    /* Responsive */
+    /* Admin panel (slide-in on right) */
+    .admin-panel {
+      position: absolute;
+      top: 0;
+      right: -360px;
+      width: 340px;
+      height: 100%;
+      background: radial-gradient(circle at top, #020617, #020617 50%, #020617);
+      border-left: 1px solid var(--border);
+      box-shadow: -18px 0 40px rgba(15, 23, 42, 0.9);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: right 0.22s ease-out;
+      z-index: 20;
+    }
+
+    .admin-panel.open {
+      right: 0;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .admin-header h3 {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .admin-tab-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--muted);
+      font-size: 11px;
+      padding: 4px 6px;
+      cursor: pointer;
+    }
+
+    .admin-tab-btn.active {
+      background: rgba(79, 70, 229, 0.3);
+      border-color: rgba(129, 140, 248, 0.8);
+      color: #e5e7eb;
+    }
+
+    .admin-body {
+      flex: 1;
+      overflow-y: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 8px;
+      background: rgba(15, 23, 42, 0.95);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .admin-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 6px;
+    }
+
+    .admin-field label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .admin-field input,
+    .admin-field select,
+    .admin-field textarea {
+      border-radius: 8px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 11px;
+      padding: 4px 6px;
+      outline: none;
+    }
+
+    .admin-field textarea {
+      resize: vertical;
+      min-height: 40px;
+    }
+
+    .admin-footer {
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .btn-small {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 11px;
+      padding: 5px 8px;
+      cursor: pointer;
+    }
+
+    .btn-small.primary {
+      background: rgba(79, 70, 229, 0.9);
+      border-color: rgba(129, 140, 248, 0.9);
+    }
+
+    .btn-small.danger {
+      border-color: rgba(248, 113, 113, 0.8);
+      color: #fecaca;
+    }
+
+    .pill-info {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
     @media (max-width: 980px) {
       body {
         flex-direction: column;
@@ -407,6 +556,9 @@
     @media (max-width: 900px) {
       .grid-3 {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .admin-panel {
+        width: 100%;
       }
     }
 
@@ -469,7 +621,7 @@
 
     <div class="sidebar-footer">
       <div>Private dashboard for <strong>Brian</strong>.</div>
-      <div>All data is local in this file – edit arrays in the script.</div>
+      <div>All data is local in this file – edit via the admin panel.</div>
     </div>
   </aside>
 
@@ -480,9 +632,14 @@
         <h2 id="page-title">Overview</h2>
         <span id="page-subtitle">High-level view of your tutoring business.</span>
       </div>
-      <div class="tag-pill">
-        <span class="dot"></span>
-        Live layout • Data-driven • Local only
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div class="tag-pill">
+          <span class="dot"></span>
+          Live layout • Data-driven • Local only
+        </div>
+        <button id="edit-toggle" class="edit-button">
+          <span class="icon">🔧</span> Edit Dashboard
+        </button>
       </div>
     </header>
 
@@ -524,9 +681,7 @@
               <h3>AI-Style Business Insights</h3>
               <span>Auto-calculated from your data</span>
             </div>
-            <ul class="ai-insight-list" id="ai-insights-list">
-              <!-- Filled by JS -->
-            </ul>
+            <ul class="ai-insight-list" id="ai-insights-list"></ul>
           </div>
           <div class="card">
             <div class="card-header">
@@ -593,9 +748,7 @@
                   <th>Weekly Sessions</th>
                 </tr>
               </thead>
-              <tbody id="students-table-body">
-                <!-- Filled by JS -->
-              </tbody>
+              <tbody id="students-table-body"></tbody>
             </table>
           </div>
         </div>
@@ -619,9 +772,7 @@
                     <th>Duration</th>
                   </tr>
                 </thead>
-                <tbody id="schedule-table-body">
-                  <!-- Filled by JS -->
-                </tbody>
+                <tbody id="schedule-table-body"></tbody>
               </table>
             </div>
           </div>
@@ -630,9 +781,7 @@
               <h3>Schedule Insights</h3>
               <span>Load & distribution</span>
             </div>
-            <ul class="ai-insight-list" id="schedule-insights-list">
-              <!-- Filled by JS -->
-            </ul>
+            <ul class="ai-insight-list" id="schedule-insights-list"></ul>
           </div>
         </div>
       </div>
@@ -659,9 +808,7 @@
                     <th>Projected Weekly Revenue</th>
                   </tr>
                 </thead>
-                <tbody id="payments-table-body">
-                  <!-- Filled by JS -->
-                </tbody>
+                <tbody id="payments-table-body"></tbody>
               </table>
             </div>
           </div>
@@ -683,12 +830,11 @@
       <div id="section-lessons" style="display:none;">
         <div class="card">
           <div class="card-header">
-            <h3>Lesson History Template</h3>
-            <span>Where you’ll log topics, homework, and notes</span>
+            <h3>Lesson History</h3>
+            <span>Log topics, homework, and notes</span>
           </div>
           <div class="section-description">
-            Right now this is just a <strong>structure</strong>. You can duplicate rows and fill them manually,
-            or later connect to a real backend. This is mainly to give you a clean “container”.
+            Use the admin panel to add entries for each session. This table updates automatically.
           </div>
           <div class="scroll-card">
             <table>
@@ -702,9 +848,7 @@
                   <th>Notes / Next Time</th>
                 </tr>
               </thead>
-              <tbody id="lessons-table-body">
-                <!-- You can manually add rows here as you go -->
-              </tbody>
+              <tbody id="lessons-table-body"></tbody>
             </table>
           </div>
         </div>
@@ -718,16 +862,7 @@
               <h3>Business Goals</h3>
               <span>Use this like your control center</span>
             </div>
-            <div class="section-description">
-              Edit this section as your targets change. It’s intentionally free-form.
-            </div>
-            <ul class="ai-insight-list">
-              <li>🎯 Weekly income goal: <strong>(fill in your target)</strong></li>
-              <li>🎯 Monthly income goal: <strong>(fill in)</strong></li>
-              <li>👥 Target active students: <strong>e.g., 15–20+</strong></li>
-              <li>⏱️ Target hours/week: <strong>e.g., 15–20 hours</strong></li>
-              <li>🧠 Future: build online course(s) & hire other tutors</li>
-            </ul>
+            <div id="goals-list" class="section-description"></div>
           </div>
 
           <div class="card">
@@ -735,241 +870,283 @@
               <h3>Stats Summary</h3>
               <span>Derived from your current data</span>
             </div>
-            <div id="goals-stats-content" style="font-size:12px;">
-              <!-- Filled by JS -->
-            </div>
+            <div id="goals-stats-content" style="font-size:12px;"></div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- ADMIN PANEL -->
+    <aside id="admin-panel" class="admin-panel">
+      <div class="admin-header">
+        <h3>Admin Panel</h3>
+        <button id="close-admin" class="btn-small">Close</button>
+      </div>
+      <div class="pill-info">
+        Edit your data here. Changes are saved locally in your browser (localStorage).
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" data-admin-tab="students">Students</button>
+        <button class="admin-tab-btn" data-admin-tab="sessions">Sessions</button>
+        <button class="admin-tab-btn" data-admin-tab="goals">Goals</button>
+        <button class="admin-tab-btn" data-admin-tab="lessons">Lessons</button>
+      </div>
+      <div class="admin-body">
+        <!-- STUDENTS TAB -->
+        <div id="admin-tab-students">
+          <div class="admin-field">
+            <label for="student-select">Select student to edit</label>
+            <select id="student-select"></select>
+          </div>
+          <div class="admin-field">
+            <label for="student-name">Name</label>
+            <input id="student-name" type="text" />
+          </div>
+          <div class="admin-field">
+            <label for="student-grade">Grade (e.g., 4th, 6th, College)</label>
+            <input id="student-grade" type="text" />
+          </div>
+          <div class="admin-field">
+            <label for="student-rate">Hourly rate (number)</label>
+            <input id="student-rate" type="number" step="1" />
+          </div>
+          <div class="admin-field">
+            <label for="student-subjects">Subjects (comma-separated)</label>
+            <input id="student-subjects" type="text" placeholder="Math, English" />
+          </div>
+          <div class="admin-footer">
+            <button id="save-student" class="btn-small primary">Save Student</button>
+            <button id="new-student" class="btn-small">New</button>
+            <button id="delete-student" class="btn-small danger">Delete</button>
+          </div>
+        </div>
+
+        <!-- SESSIONS TAB -->
+        <div id="admin-tab-sessions" style="display:none;">
+          <div class="admin-field">
+            <label for="session-select">Select session to edit</label>
+            <select id="session-select"></select>
+          </div>
+          <div class="admin-field">
+            <label for="session-day">Day</label>
+            <select id="session-day">
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+              <option>Sunday</option>
+            </select>
+          </div>
+          <div class="admin-field">
+            <label for="session-start">Start time (e.g., 5:00 pm)</label>
+            <input id="session-start" type="text" />
+          </div>
+          <div class="admin-field">
+            <label for="session-end">End time (e.g., 6:00 pm)</label>
+            <input id="session-end" type="text" />
+          </div>
+          <div class="admin-field">
+            <label for="session-duration">Duration (minutes)</label>
+            <input id="session-duration" type="number" step="5" />
+          </div>
+          <div class="admin-field">
+            <label for="session-student">Student</label>
+            <select id="session-student"></select>
+          </div>
+          <div class="admin-field">
+            <label for="session-rate">Rate override (optional, blank = use student's rate)</label>
+            <input id="session-rate" type="number" step="1" />
+          </div>
+          <div class="admin-field">
+            <label for="session-subject">Subject (optional, e.g., Precalculus, History)</label>
+            <input id="session-subject" type="text" />
+          </div>
+          <div class="admin-footer">
+            <button id="save-session" class="btn-small primary">Save Session</button>
+            <button id="new-session" class="btn-small">New</button>
+            <button id="delete-session" class="btn-small danger">Delete</button>
+          </div>
+        </div>
+
+        <!-- GOALS TAB -->
+        <div id="admin-tab-goals" style="display:none;">
+          <div class="admin-field">
+            <label for="goal-weekly-income">Weekly income goal ($)</label>
+            <input id="goal-weekly-income" type="number" step="1" />
+          </div>
+          <div class="admin-field">
+            <label for="goal-monthly-income">Monthly income goal ($)</label>
+            <input id="goal-monthly-income" type="number" step="1" />
+          </div>
+          <div class="admin-field">
+            <label for="goal-target-students">Target active students</label>
+            <input id="goal-target-students" type="number" step="1" />
+          </div>
+          <div class="admin-field">
+            <label for="goal-target-hours">Target hours per week</label>
+            <input id="goal-target-hours" type="number" step="0.5" />
+          </div>
+          <div class="admin-field">
+            <label for="goal-notes">Other goals / notes</label>
+            <textarea id="goal-notes" placeholder="Future: hire tutors, build online course, etc."></textarea>
+          </div>
+          <div class="admin-footer">
+            <button id="save-goals" class="btn-small primary">Save Goals</button>
+          </div>
+        </div>
+
+        <!-- LESSONS TAB -->
+        <div id="admin-tab-lessons" style="display:none;">
+          <div class="admin-field">
+            <label for="lesson-select">Select lesson (optional)</label>
+            <select id="lesson-select"></select>
+          </div>
+          <div class="admin-field">
+            <label for="lesson-date">Date (e.g., 2025-11-17)</label>
+            <input id="lesson-date" type="text" />
+          </div>
+          <div class="admin-field">
+            <label for="lesson-student">Student</label>
+            <select id="lesson-student"></select>
+          </div>
+          <div class="admin-field">
+            <label for="lesson-subject">Subject</label>
+            <input id="lesson-subject" type="text" />
+          </div>
+          <div class="admin-field">
+            <label for="lesson-topic">Main Topic / Skill</label>
+            <input id="lesson-topic" type="text" />
+          </div>
+          <div class="admin-field">
+            <label for="lesson-homework">Homework Given</label>
+            <textarea id="lesson-homework"></textarea>
+          </div>
+          <div class="admin-field">
+            <label for="lesson-notes">Notes / Next Time</label>
+            <textarea id="lesson-notes"></textarea>
+          </div>
+          <div class="admin-footer">
+            <button id="save-lesson" class="btn-small primary">Save Lesson</button>
+            <button id="new-lesson" class="btn-small">New</button>
+            <button id="delete-lesson" class="btn-small danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </aside>
   </main>
 
   <script>
     // ==========
-    // DATA LAYER
+    // STORAGE / DEFAULT DATA
     // ==========
 
-    // Students configuration
-    const students = [
-      {
-        id: "diana",
-        name: "Diana",
-        grade: "4th",
-        hourlyRate: 40,
-        subjects: ["Math", "English"],
-      },
-      {
-        id: "lucas",
-        name: "Lucas",
-        grade: "6th",
-        hourlyRate: 45,
-        subjects: ["ELA", "Writing"],
-      },
-      {
-        id: "eva",
-        name: "Eva",
-        grade: "4th",
-        hourlyRate: 27, // per 40 minutes
-        subjects: ["Math"],
-        sessionMinutes: 40,
-      },
-      {
-        id: "milana",
-        name: "Milana",
-        grade: "4th",
-        hourlyRate: 45,
-        subjects: ["Math", "English"],
-      },
-      {
-        id: "leo",
-        name: "Leo",
-        grade: "1st",
-        hourlyRate: 30,
-        subjects: ["Reading", "Writing"],
-      },
-      {
-        id: "stephanie",
-        name: "Stephanie",
-        grade: "4th",
-        hourlyRate: 35,
-        subjects: ["English", "Writing"],
-      },
-      {
-        id: "gabriel",
-        name: "Gabriel",
-        grade: "College",
-        hourlyRate: 60, // math rate; history is higher, you can adjust per session if you want
-        subjects: ["Precalculus", "History"],
-      },
-      {
-        id: "maksim",
-        name: "Maksim",
-        grade: "7th",
-        hourlyRate: 65,
-        subjects: ["Math"],
-      },
-      {
-        id: "savion",
-        name: "Savion",
-        grade: "College",
-        hourlyRate: 60,
-        subjects: ["Math"],
-      },
-      {
-        id: "eric",
-        name: "Eric",
-        grade: "College",
-        hourlyRate: 75,
-        subjects: ["Precalculus"],
-      },
-      {
-        id: "timothy",
-        name: "Timothy",
-        grade: "4th",
-        hourlyRate: 60,
-        subjects: ["Math"],
-      },
+    const STORAGE_KEY_STUDENTS = "rea_students_v1";
+    const STORAGE_KEY_SESSIONS = "rea_sessions_v1";
+    const STORAGE_KEY_GOALS = "rea_goals_v1";
+    const STORAGE_KEY_LESSONS = "rea_lessons_v1";
+
+    const defaultStudents = [
+      { id: "diana", name: "Diana", grade: "4th", hourlyRate: 40, subjects: ["Math", "English"] },
+      { id: "lucas", name: "Lucas", grade: "6th", hourlyRate: 45, subjects: ["ELA", "Writing"] },
+      { id: "eva", name: "Eva", grade: "4th", hourlyRate: 27, subjects: ["Math"], sessionMinutes: 40 },
+      { id: "milana", name: "Milana", grade: "4th", hourlyRate: 45, subjects: ["Math", "English"] },
+      { id: "leo", name: "Leo", grade: "1st", hourlyRate: 30, subjects: ["Reading", "Writing"] },
+      { id: "stephanie", name: "Stephanie", grade: "4th", hourlyRate: 35, subjects: ["English", "Writing"] },
+      { id: "gabriel", name: "Gabriel", grade: "College", hourlyRate: 60, subjects: ["Precalculus", "History"] },
+      { id: "maksim", name: "Maksim", grade: "7th", hourlyRate: 65, subjects: ["Math"] },
+      { id: "savion", name: "Savion", grade: "College", hourlyRate: 60, subjects: ["Math"] },
+      { id: "eric", name: "Eric", grade: "College", hourlyRate: 75, subjects: ["Precalculus"] },
+      { id: "timothy", name: "Timothy", grade: "4th", hourlyRate: 60, subjects: ["Math"] },
     ];
 
-    // Helper to get student by ID
-    const studentById = Object.fromEntries(students.map(s => [s.id, s]));
-
-    // Weekly schedule (each session is one row)
-    // Duration is in minutes. For standard 1-hour blocks: 60.
-    const sessions = [
-      // Monday
-      {
-        day: "Monday",
-        start: "6:30 pm",
-        end: "7:30 pm",
-        durationMinutes: 60,
-        studentId: "diana",
-      },
-      // Tuesday
-      {
-        day: "Tuesday",
-        start: "4:20 pm",
-        end: "5:00 pm",
-        durationMinutes: 40,
-        studentId: "eva",
-      },
-      {
-        day: "Tuesday",
-        start: "5:00 pm",
-        end: "6:00 pm",
-        durationMinutes: 60,
-        studentId: "lucas",
-      },
-      {
-        day: "Tuesday",
-        start: "7:00 pm",
-        end: "8:00 pm",
-        durationMinutes: 60,
-        studentId: "timothy",
-      },
-      // Thursday
-      {
-        day: "Thursday",
-        start: "3:00 pm",
-        end: "4:00 pm",
-        durationMinutes: 60,
-        studentId: "leo",
-      },
-      {
-        day: "Thursday",
-        start: "5:00 pm",
-        end: "6:00 pm",
-        durationMinutes: 60,
-        studentId: "lucas",
-      },
-      {
-        day: "Thursday",
-        start: "6:00 pm",
-        end: "7:00 pm",
-        durationMinutes: 60,
-        studentId: "stephanie",
-      },
-      // Friday (Savion time TBD, leaving out until set)
-      {
-        day: "Friday",
-        start: "1:00 pm",
-        end: "2:00 pm",
-        durationMinutes: 60,
-        studentId: "gabriel",
-      },
-      {
-        day: "Friday",
-        start: "3:00 pm",
-        end: "4:00 pm",
-        durationMinutes: 60,
-        studentId: "leo",
-      },
-      {
-        day: "Friday",
-        start: "4:00 pm",
-        end: "5:00 pm",
-        durationMinutes: 60,
-        studentId: "diana",
-      },
-      {
-        day: "Friday",
-        start: "5:00 pm",
-        end: "6:00 pm",
-        durationMinutes: 60,
-        studentId: "maksim",
-      },
+    const defaultSessions = [
+      { id: "s1", day: "Monday",   start: "6:30 pm", end: "7:30 pm", durationMinutes: 60, studentId: "diana" },
+      { id: "s2", day: "Tuesday",  start: "4:20 pm", end: "5:00 pm", durationMinutes: 40, studentId: "eva" },
+      { id: "s3", day: "Tuesday",  start: "5:00 pm", end: "6:00 pm", durationMinutes: 60, studentId: "lucas" },
+      { id: "s4", day: "Tuesday",  start: "7:00 pm", end: "8:00 pm", durationMinutes: 60, studentId: "timothy" },
+      { id: "s5", day: "Thursday", start: "3:00 pm", end: "4:00 pm", durationMinutes: 60, studentId: "leo" },
+      { id: "s6", day: "Thursday", start: "5:00 pm", end: "6:00 pm", durationMinutes: 60, studentId: "lucas" },
+      { id: "s7", day: "Thursday", start: "6:00 pm", end: "7:00 pm", durationMinutes: 60, studentId: "stephanie" },
+      // Friday (Gabriel math)
+      { id: "s8", day: "Friday",   start: "1:00 pm", end: "2:00 pm", durationMinutes: 60, studentId: "gabriel", subject: "Precalculus", rateOverride: 60 },
+      { id: "s9", day: "Friday",   start: "3:00 pm", end: "4:00 pm", durationMinutes: 60, studentId: "leo" },
+      { id: "s10",day: "Friday",   start: "4:00 pm", end: "5:00 pm", durationMinutes: 60, studentId: "diana" },
+      { id: "s11",day: "Friday",   start: "5:00 pm", end: "6:00 pm", durationMinutes: 60, studentId: "maksim" },
       // Saturday
-      {
-        day: "Saturday",
-        start: "11:00 am",
-        end: "12:00 pm",
-        durationMinutes: 60,
-        studentId: "milana",
-      },
+      { id: "s12",day: "Saturday", start: "11:00 am",end: "12:00 pm",durationMinutes: 60, studentId: "milana" },
       // Sunday
-      {
-        day: "Sunday",
-        start: "10:00 am",
-        end: "11:00 am",
-        durationMinutes: 60,
-        studentId: "maksim",
-      },
-      {
-        day: "Sunday",
-        start: "11:00 am",
-        end: "12:00 pm",
-        durationMinutes: 60,
-        studentId: "eric",
-      },
-      {
-        day: "Sunday",
-        start: "12:00 pm",
-        end: "1:00 pm",
-        durationMinutes: 60,
-        studentId: "gabriel",
-      },
+      { id: "s13",day: "Sunday",   start: "10:00 am",end: "11:00 am",durationMinutes: 60, studentId: "maksim" },
+      { id: "s14",day: "Sunday",   start: "11:00 am",end: "12:00 pm",durationMinutes: 60, studentId: "eric" },
+      // Gabriel history on Sunday @ 85/hr
+      { id: "s15",day: "Sunday",   start: "12:00 pm",end: "1:00 pm", durationMinutes: 60, studentId: "gabriel", subject: "History", rateOverride: 85 },
+      // NOTE: Savion Friday time TBD – you can add via admin.
     ];
+
+    const defaultGoals = {
+      weeklyIncome: "",
+      monthlyIncome: "",
+      targetStudents: "",
+      targetHours: "",
+      notes: "Future: hire tutors, build online course, grow revenue."
+    };
+
+    let students = [];
+    let sessions = [];
+    let lessons = [];
+    let goals = {};
+
+    function loadFromStorage() {
+      try {
+        const s = localStorage.getItem(STORAGE_KEY_STUDENTS);
+        const se = localStorage.getItem(STORAGE_KEY_SESSIONS);
+        const g = localStorage.getItem(STORAGE_KEY_GOALS);
+        const l = localStorage.getItem(STORAGE_KEY_LESSONS);
+
+        students = s ? JSON.parse(s) : defaultStudents.slice();
+        sessions = se ? JSON.parse(se) : defaultSessions.slice();
+        goals = g ? JSON.parse(g) : { ...defaultGoals };
+        lessons = l ? JSON.parse(l) : [];
+      } catch (e) {
+        students = defaultStudents.slice();
+        sessions = defaultSessions.slice();
+        goals = { ...defaultGoals };
+        lessons = [];
+      }
+    }
+
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(students));
+      localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify(sessions));
+      localStorage.setItem(STORAGE_KEY_GOALS, JSON.stringify(goals));
+      localStorage.setItem(STORAGE_KEY_LESSONS, JSON.stringify(lessons));
+    }
+
+    function getStudentMap() {
+      return Object.fromEntries(students.map(s => [s.id, s]));
+    }
 
     // ==========
     // AGGREGATION
     // ==========
 
     function computeWeeklyHours() {
-      const totalMinutes = sessions.reduce((acc, s) => acc + s.durationMinutes, 0);
+      const totalMinutes = sessions.reduce((acc, s) => acc + (s.durationMinutes || 0), 0);
       return totalMinutes / 60;
     }
 
     function computeWeeklyRevenue() {
+      const studentById = getStudentMap();
       let total = 0;
       for (const s of sessions) {
         const student = studentById[s.studentId];
         if (!student) continue;
-        // Special handling for Eva: 27 per 40 minutes flat
         if (student.id === "eva") {
-          total += 27;
+          total += 27; // one flat fee per 40-min session
         } else {
-          const rate = student.hourlyRate || 0;
-          total += rate * (s.durationMinutes / 60);
+          const rate = (s.rateOverride != null ? s.rateOverride : (student.hourlyRate || 0));
+          total += rate * ((s.durationMinutes || 60) / 60);
         }
       }
       return total;
@@ -991,6 +1168,7 @@
     }
 
     function computeRevenuePerStudent() {
+      const studentById = getStudentMap();
       const map = {};
       for (const s of sessions) {
         const student = studentById[s.studentId];
@@ -999,7 +1177,8 @@
         if (student.id === "eva") {
           amount = 27;
         } else {
-          amount = (student.hourlyRate || 0) * (s.durationMinutes / 60);
+          const rate = (s.rateOverride != null ? s.rateOverride : (student.hourlyRate || 0));
+          amount = rate * ((s.durationMinutes || 60) / 60);
         }
         map[s.studentId] = (map[s.studentId] || 0) + amount;
       }
@@ -1007,11 +1186,11 @@
     }
 
     function computeHoursPerDay() {
-      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
       const map = {};
       for (const d of days) map[d] = 0;
       for (const s of sessions) {
-        map[s.day] += s.durationMinutes / 60;
+        map[s.day] = (map[s.day] || 0) + ((s.durationMinutes || 60) / 60);
       }
       return map;
     }
@@ -1019,7 +1198,7 @@
     function computeStudentsByGrade() {
       const map = {};
       for (const s of students) {
-        const g = s.grade;
+        const g = s.grade || "Unknown";
         map[g] = (map[g] || 0) + 1;
       }
       return map;
@@ -1029,6 +1208,9 @@
     // RENDERING
     // ==========
 
+    let chartHours;
+    let chartGrades;
+
     function renderOverview() {
       const totalStudents = students.length;
       const weeklyHours = computeWeeklyHours();
@@ -1037,46 +1219,34 @@
       const sessionsMap = computeSessionsPerStudent();
       const revenueMap = computeRevenuePerStudent();
 
-      // Main stats
       document.getElementById("stat-total-students").textContent = totalStudents;
       document.getElementById("stat-weekly-hours").textContent = weeklyHours.toFixed(2) + " hrs";
       document.getElementById("stat-weekly-revenue").textContent = "$" + weeklyRevenue.toFixed(2);
 
       document.getElementById("pill-avg-rate").textContent =
         "Avg hourly rate: $" + avgRate.toFixed(2);
-
-      const totalSessions = sessions.length;
       document.getElementById("pill-total-sessions").textContent =
-        "Weekly sessions: " + totalSessions;
+        "Weekly sessions: " + sessions.length;
 
-      // AI-style insights
       const insightsList = document.getElementById("ai-insights-list");
       insightsList.innerHTML = "";
 
-      // Top revenue student
-      let topStudentId = null,
-        topRevenue = 0;
+      let topStudentId = null, topRevenue = 0;
       for (const [id, rev] of Object.entries(revenueMap)) {
         if (rev > topRevenue) {
           topRevenue = rev;
           topStudentId = id;
         }
       }
+      const studentById = getStudentMap();
       if (topStudentId) {
         const s = studentById[topStudentId];
         const li = document.createElement("li");
-        li.innerHTML =
-          "💡 <strong>Highest revenue student:</strong> " +
-          s.name +
-          " brings approx <strong>$" +
-          topRevenue.toFixed(2) +
-          "</strong> per week.";
+        li.innerHTML = `💡 <strong>Highest revenue student:</strong> ${s.name} brings approx <strong>$${topRevenue.toFixed(2)}</strong> per week.`;
         insightsList.appendChild(li);
       }
 
-      // Most frequent sessions
-      let busiestStudentId = null,
-        maxSessions = 0;
+      let busiestStudentId = null, maxSessions = 0;
       for (const [id, count] of Object.entries(sessionsMap)) {
         if (count > maxSessions) {
           maxSessions = count;
@@ -1086,56 +1256,41 @@
       if (busiestStudentId) {
         const s = studentById[busiestStudentId];
         const li = document.createElement("li");
-        li.innerHTML =
-          "📚 <strong>Most frequent sessions:</strong> " +
-          s.name +
-          " has <strong>" +
-          maxSessions +
-          "</strong> sessions per week.";
+        li.innerHTML = `📚 <strong>Most frequent sessions:</strong> ${s.name} has <strong>${maxSessions}</strong> sessions per week.`;
         insightsList.appendChild(li);
       }
 
-      // Workload level
       const liWorkload = document.createElement("li");
       let workloadLabel = "balanced";
       if (weeklyHours < 10) workloadLabel = "light";
       else if (weeklyHours > 18) workloadLabel = "heavy";
-
       liWorkload.innerHTML =
-        "⏱️ <strong>Workload:</strong> About <strong>" +
-        weeklyHours.toFixed(2) +
-        " hours</strong> of tutoring per week (" +
-        workloadLabel +
-        " load).";
+        `⏱️ <strong>Workload:</strong> About <strong>${weeklyHours.toFixed(2)} hours</strong> of tutoring per week (${workloadLabel} load).`;
       insightsList.appendChild(liWorkload);
 
-      // Spread elementary/middle/college
       const gradeMap = computeStudentsByGrade();
       const liGrades = document.createElement("li");
       liGrades.innerHTML =
         "👥 <strong>Grade mix:</strong> " +
-        Object.entries(gradeMap)
-          .map(([grade, count]) => grade + ": " + count)
-          .join(" • ") +
+        Object.entries(gradeMap).map(([grade, count]) => `${grade}: ${count}`).join(" • ") +
         ".";
       insightsList.appendChild(liGrades);
+
+      renderCharts();
     }
 
     function renderStudentsTable() {
       const tbody = document.getElementById("students-table-body");
       tbody.innerHTML = "";
-
       const sessionsMap = computeSessionsPerStudent();
 
       for (const s of students) {
         const tr = document.createElement("tr");
 
-        // Name
         const tdName = document.createElement("td");
         tdName.textContent = s.name;
         tr.appendChild(tdName);
 
-        // Grade
         const tdGrade = document.createElement("td");
         const gradeBadge = document.createElement("span");
         gradeBadge.className = "badge " + (s.grade === "College" ? "college" : "grade");
@@ -1143,18 +1298,13 @@
         tdGrade.appendChild(gradeBadge);
         tr.appendChild(tdGrade);
 
-        // Rate
         const tdRate = document.createElement("td");
-        if (s.id === "eva") {
-          tdRate.textContent = "$27 / 40 min";
-        } else {
-          tdRate.textContent = "$" + s.hourlyRate + " / hr";
-        }
+        if (s.id === "eva") tdRate.textContent = "$27 / 40 min";
+        else tdRate.textContent = "$" + (s.hourlyRate || 0) + " / hr";
         tr.appendChild(tdRate);
 
-        // Subjects
         const tdSubjects = document.createElement("td");
-        s.subjects.forEach((subj, idx) => {
+        (s.subjects || []).forEach(subj => {
           const span = document.createElement("span");
           span.className = "badge subject";
           span.style.marginRight = "4px";
@@ -1163,10 +1313,8 @@
         });
         tr.appendChild(tdSubjects);
 
-        // Weekly sessions
         const tdSessions = document.createElement("td");
-        const count = sessionsMap[s.id] || 0;
-        tdSessions.textContent = count;
+        tdSessions.textContent = sessionsMap[s.id] || 0;
         tr.appendChild(tdSessions);
 
         tbody.appendChild(tr);
@@ -1177,20 +1325,11 @@
       const tbody = document.getElementById("schedule-table-body");
       tbody.innerHTML = "";
 
-      // Sort by day order
-      const dayOrder = {
-        Monday: 1,
-        Tuesday: 2,
-        Wednesday: 3,
-        Thursday: 4,
-        Friday: 5,
-        Saturday: 6,
-        Sunday: 7,
-      };
-
-      const sessionsSorted = [...sessions].sort((a, b) => {
+      const studentById = getStudentMap();
+      const dayOrder = { Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6, Sunday:7 };
+      const sessionsSorted = [...sessions].sort((a,b) => {
         if (a.day === b.day) return 0;
-        return dayOrder[a.day] - dayOrder[b.day];
+        return (dayOrder[a.day] || 10) - (dayOrder[b.day] || 10);
       });
 
       for (const s of sessionsSorted) {
@@ -1204,22 +1343,20 @@
         tr.appendChild(tdDay);
 
         const tdTime = document.createElement("td");
-        tdTime.textContent = s.start + " – " + s.end;
+        tdTime.textContent = `${s.start} – ${s.end}`;
         tr.appendChild(tdTime);
 
         const tdStudent = document.createElement("td");
-        const st = studentById[s.studentId];
-        tdStudent.textContent = st ? st.name : "Unknown";
+        tdStudent.textContent = studentById[s.studentId]?.name || "Unknown";
         tr.appendChild(tdStudent);
 
         const tdDuration = document.createElement("td");
-        tdDuration.textContent = (s.durationMinutes / 60).toFixed(2) + " hrs";
+        tdDuration.textContent = ((s.durationMinutes || 60) / 60).toFixed(2) + " hrs";
         tr.appendChild(tdDuration);
 
         tbody.appendChild(tr);
       }
 
-      // Schedule insights
       const list = document.getElementById("schedule-insights-list");
       list.innerHTML = "";
       const hoursPerDay = computeHoursPerDay();
@@ -1230,24 +1367,17 @@
 
       const li1 = document.createElement("li");
       li1.innerHTML =
-        "🗓️ <strong>Busiest day:</strong> " +
-        busiestDay[0] +
-        " with " +
-        busiestDay[1].toFixed(2) +
-        " hours.";
+        `🗓️ <strong>Busiest day:</strong> ${busiestDay[0]} with ${busiestDay[1].toFixed(2)} hours.`;
       list.appendChild(li1);
 
       const li2 = document.createElement("li");
-      li2.innerHTML =
-        "📆 <strong>Empty day:</strong> Wednesday is currently free – possible slot for new student(s).";
+      li2.innerHTML = "📆 <strong>Empty day:</strong> Wednesday is currently free – possible slot for new student(s).";
       list.appendChild(li2);
 
-      const li3 = document.createElement("li");
       const weekendHours = (hoursPerDay["Saturday"] || 0) + (hoursPerDay["Sunday"] || 0);
+      const li3 = document.createElement("li");
       li3.innerHTML =
-        "📚 <strong>Weekend teaching:</strong> " +
-        weekendHours.toFixed(2) +
-        " hours across Saturday & Sunday.";
+        `📚 <strong>Weekend teaching:</strong> ${weekendHours.toFixed(2)} hours across Saturday & Sunday.`;
       list.appendChild(li3);
     }
 
@@ -1265,13 +1395,11 @@
         tr.appendChild(tdName);
 
         const tdRate = document.createElement("td");
-        tdRate.textContent =
-          s.id === "eva" ? "$27 / 40 min" : "$" + s.hourlyRate + " / hr";
+        tdRate.textContent = s.id === "eva" ? "$27 / 40 min" : "$" + (s.hourlyRate || 0) + " / hr";
         tr.appendChild(tdRate);
 
         const tdSessions = document.createElement("td");
-        const count = sessionsMap[s.id] || 0;
-        tdSessions.textContent = count;
+        tdSessions.textContent = sessionsMap[s.id] || 0;
         tr.appendChild(tdSessions);
 
         const tdRevenue = document.createElement("td");
@@ -1283,14 +1411,65 @@
       }
     }
 
-    function renderGoalsStats() {
-      const container = document.getElementById("goals-stats-content");
+    function renderLessonsTable() {
+      const tbody = document.getElementById("lessons-table-body");
+      tbody.innerHTML = "";
+      const studentById = getStudentMap();
+      for (const l of lessons) {
+        const tr = document.createElement("tr");
+        const tdDate = document.createElement("td");
+        tdDate.textContent = l.date || "";
+        tr.appendChild(tdDate);
+
+        const tdStudent = document.createElement("td");
+        tdStudent.textContent = studentById[l.studentId]?.name || "";
+        tr.appendChild(tdStudent);
+
+        const tdSubject = document.createElement("td");
+        tdSubject.textContent = l.subject || "";
+        tr.appendChild(tdSubject);
+
+        const tdTopic = document.createElement("td");
+        tdTopic.textContent = l.topic || "";
+        tr.appendChild(tdTopic);
+
+        const tdHW = document.createElement("td");
+        tdHW.textContent = l.homework || "";
+        tr.appendChild(tdHW);
+
+        const tdNotes = document.createElement("td");
+        tdNotes.textContent = l.notes || "";
+        tr.appendChild(tdNotes);
+
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderGoals() {
+      const container = document.getElementById("goals-list");
+      const weekly = goals.weeklyIncome ? `$${goals.weeklyIncome}` : "(set a number)";
+      const monthly = goals.monthlyIncome ? `$${goals.monthlyIncome}` : "(set a number)";
+      const ts = goals.targetStudents || "(set)";
+      const th = goals.targetHours || "(set)";
+      const notes = goals.notes || "";
+
+      container.innerHTML = `
+        <ul class="ai-insight-list">
+          <li>🎯 <strong>Weekly income goal:</strong> ${weekly}</li>
+          <li>🎯 <strong>Monthly income goal:</strong> ${monthly}</li>
+          <li>👥 <strong>Target active students:</strong> ${ts}</li>
+          <li>⏱️ <strong>Target hours/week:</strong> ${th}</li>
+          ${notes ? `<li>🧠 <strong>Other goals:</strong> ${notes}</li>` : ""}
+        </ul>
+      `;
+
+      const summary = document.getElementById("goals-stats-content");
       const totalStudents = students.length;
       const hours = computeWeeklyHours();
       const revenue = computeWeeklyRevenue();
       const avgRate = computeAverageRate();
 
-      container.innerHTML = `
+      summary.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:4px;">
           <div><strong>Active students:</strong> ${totalStudents}</div>
           <div><strong>Weekly hours (scheduled):</strong> ${hours.toFixed(2)} hrs</div>
@@ -1305,28 +1484,18 @@
       `;
     }
 
-    // ==========
-    // CHARTS
-    // ==========
-
-    function initCharts() {
+    function renderCharts() {
       const hoursPerDay = computeHoursPerDay();
       const ctx1 = document.getElementById("chart-hours-per-day").getContext("2d");
-      new Chart(ctx1, {
+      if (chartHours) chartHours.destroy();
+      chartHours = new Chart(ctx1, {
         type: "bar",
         data: {
           labels: Object.keys(hoursPerDay),
-          datasets: [
-            {
-              label: "Hours",
-              data: Object.values(hoursPerDay),
-            },
-          ],
+          datasets: [{ label: "Hours", data: Object.values(hoursPerDay) }],
         },
         options: {
-          plugins: {
-            legend: { display: false },
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: {
               ticks: { color: "#9ca3af", font: { size: 11 } },
@@ -1342,23 +1511,17 @@
 
       const studentsByGrade = computeStudentsByGrade();
       const ctx2 = document.getElementById("chart-students-by-grade").getContext("2d");
-      new Chart(ctx2, {
+      if (chartGrades) chartGrades.destroy();
+      chartGrades = new Chart(ctx2, {
         type: "pie",
         data: {
           labels: Object.keys(studentsByGrade),
-          datasets: [
-            {
-              data: Object.values(studentsByGrade),
-            },
-          ],
+          datasets: [{ data: Object.values(studentsByGrade) }],
         },
         options: {
           plugins: {
             legend: {
-              labels: {
-                color: "#e5e7eb",
-                font: { size: 11 },
-              },
+              labels: { color: "#e5e7eb", font: { size: 11 } },
             },
           },
         },
@@ -1366,7 +1529,92 @@
     }
 
     // ==========
-    // NAVIGATION
+    // ADMIN PANEL HELPERS
+    // ==========
+
+    function populateStudentSelects() {
+      const studentSelect = document.getElementById("student-select");
+      const sessionStudent = document.getElementById("session-student");
+      const lessonStudent = document.getElementById("lesson-student");
+
+      [studentSelect, sessionStudent, lessonStudent].forEach(sel => {
+        sel.innerHTML = "";
+        students.forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = s.name;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    function populateSessionSelect() {
+      const sel = document.getElementById("session-select");
+      sel.innerHTML = "";
+      const studentById = getStudentMap();
+      sessions.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        const name = studentById[s.studentId]?.name || "Unknown";
+        opt.textContent = `${s.day} – ${name} (${s.start}–${s.end})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function populateLessonSelect() {
+      const sel = document.getElementById("lesson-select");
+      sel.innerHTML = "";
+      const studentById = getStudentMap();
+      lessons.forEach((l, idx) => {
+        const opt = document.createElement("option");
+        opt.value = String(idx);
+        opt.textContent = `${l.date || "No date"} – ${studentById[l.studentId]?.name || ""}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function fillStudentFormById(id) {
+      const s = students.find(st => st.id === id);
+      if (!s) return;
+      document.getElementById("student-name").value = s.name || "";
+      document.getElementById("student-grade").value = s.grade || "";
+      document.getElementById("student-rate").value = s.hourlyRate ?? "";
+      document.getElementById("student-subjects").value = (s.subjects || []).join(", ");
+    }
+
+    function fillSessionFormById(id) {
+      const s = sessions.find(se => se.id === id);
+      if (!s) return;
+      document.getElementById("session-day").value = s.day || "Monday";
+      document.getElementById("session-start").value = s.start || "";
+      document.getElementById("session-end").value = s.end || "";
+      document.getElementById("session-duration").value = s.durationMinutes ?? 60;
+      document.getElementById("session-student").value = s.studentId || "";
+      document.getElementById("session-rate").value = s.rateOverride ?? "";
+      document.getElementById("session-subject").value = s.subject || "";
+    }
+
+    function fillLessonFormIndex(idx) {
+      const l = lessons[idx];
+      if (!l) return;
+      document.getElementById("lesson-date").value = l.date || "";
+      document.getElementById("lesson-student").value = l.studentId || "";
+      document.getElementById("lesson-subject").value = l.subject || "";
+      document.getElementById("lesson-topic").value = l.topic || "";
+      document.getElementById("lesson-homework").value = l.homework || "";
+      document.getElementById("lesson-notes").value = l.notes || "";
+    }
+
+    function fillGoalsForm() {
+      document.getElementById("goal-weekly-income").value = goals.weeklyIncome || "";
+      document.getElementById("goal-monthly-income").value = goals.monthlyIncome || "";
+      document.getElementById("goal-target-students").value = goals.targetStudents || "";
+      document.getElementById("goal-target-hours").value = goals.targetHours || "";
+      document.getElementById("goal-notes").value = goals.notes || "";
+    }
+
+    // ==========
+    // NAVIGATION + ADMIN PANEL WIRES
     // ==========
 
     const navButtons = document.querySelectorAll(".nav-item button");
@@ -1395,7 +1643,7 @@
         students: ["Students", "Who you teach, what they pay, and what they study."],
         schedule: ["Schedule", "Your weekly tutoring workload by day."],
         payments: ["Payments", "Projected revenue based on your schedule."],
-        lessons: ["Lesson History", "Template area to log what you cover in each session."],
+        lessons: ["Lesson History", "Log what you cover in each session."],
         goals: ["Goals & Stats", "Targets + auto-calculated stats from your data."],
       };
 
@@ -1409,17 +1657,241 @@
       });
     });
 
+    // Admin panel
+    const adminPanel = document.getElementById("admin-panel");
+    const editToggle = document.getElementById("edit-toggle");
+    const closeAdmin = document.getElementById("close-admin");
+    const adminTabButtons = document.querySelectorAll(".admin-tab-btn");
+
+    editToggle.addEventListener("click", () => {
+      adminPanel.classList.add("open");
+      // Default tab = students
+      setAdminTab("students");
+    });
+
+    closeAdmin.addEventListener("click", () => {
+      adminPanel.classList.remove("open");
+    });
+
+    function setAdminTab(tab) {
+      adminTabButtons.forEach(btn => {
+        const isActive = btn.dataset.adminTab === tab;
+        btn.classList.toggle("active", isActive);
+      });
+      document.getElementById("admin-tab-students").style.display = tab === "students" ? "block" : "none";
+      document.getElementById("admin-tab-sessions").style.display = tab === "sessions" ? "block" : "none";
+      document.getElementById("admin-tab-goals").style.display = tab === "goals" ? "block" : "none";
+      document.getElementById("admin-tab-lessons").style.display = tab === "lessons" ? "block" : "none";
+    }
+
+    adminTabButtons.forEach(btn => {
+      btn.addEventListener("click", () => setAdminTab(btn.dataset.adminTab));
+    });
+
     // ==========
-    // INIT
+    // ADMIN: STUDENTS
     // ==========
 
-    function init() {
+    document.getElementById("student-select").addEventListener("change", e => {
+      fillStudentFormById(e.target.value);
+    });
+
+    document.getElementById("save-student").addEventListener("click", () => {
+      const select = document.getElementById("student-select");
+      let id = select.value;
+
+      if (!id) {
+        // new student
+        id = "s" + (Date.now());
+        students.push({ id });
+        select.value = id;
+      }
+
+      const s = students.find(st => st.id === id);
+      if (!s) return;
+
+      s.name = document.getElementById("student-name").value.trim() || "Unnamed";
+      s.grade = document.getElementById("student-grade").value.trim() || "Unknown";
+      s.hourlyRate = Number(document.getElementById("student-rate").value || 0);
+      const subs = document.getElementById("student-subjects").value.trim();
+      s.subjects = subs ? subs.split(",").map(x => x.trim()).filter(Boolean) : [];
+
+      saveToStorage();
+      populateStudentSelects();
+      populateSessionSelect();
+      renderAll();
+    });
+
+    document.getElementById("new-student").addEventListener("click", () => {
+      document.getElementById("student-select").value = "";
+      document.getElementById("student-name").value = "";
+      document.getElementById("student-grade").value = "";
+      document.getElementById("student-rate").value = "";
+      document.getElementById("student-subjects").value = "";
+    });
+
+    document.getElementById("delete-student").addEventListener("click", () => {
+      const id = document.getElementById("student-select").value;
+      if (!id) return;
+      if (!confirm("Delete this student and any sessions/lessons tied to them?")) return;
+      students = students.filter(s => s.id !== id);
+      sessions = sessions.filter(s => s.studentId !== id);
+      lessons = lessons.filter(l => l.studentId !== id);
+      saveToStorage();
+      populateStudentSelects();
+      populateSessionSelect();
+      populateLessonSelect();
+      renderAll();
+      document.getElementById("new-student").click();
+    });
+
+    // ==========
+    // ADMIN: SESSIONS
+    // ==========
+
+    document.getElementById("session-select").addEventListener("change", e => {
+      fillSessionFormById(e.target.value);
+    });
+
+    document.getElementById("save-session").addEventListener("click", () => {
+      const sel = document.getElementById("session-select");
+      let id = sel.value;
+      if (!id) {
+        id = "session-" + Date.now();
+        sessions.push({ id });
+        sel.value = id;
+      }
+      const s = sessions.find(se => se.id === id);
+      if (!s) return;
+
+      s.day = document.getElementById("session-day").value;
+      s.start = document.getElementById("session-start").value || "";
+      s.end = document.getElementById("session-end").value || "";
+      s.durationMinutes = Number(document.getElementById("session-duration").value || 60);
+      s.studentId = document.getElementById("session-student").value;
+      const ro = document.getElementById("session-rate").value;
+      s.rateOverride = ro === "" ? undefined : Number(ro);
+      s.subject = document.getElementById("session-subject").value || "";
+
+      saveToStorage();
+      populateSessionSelect();
+      renderAll();
+    });
+
+    document.getElementById("new-session").addEventListener("click", () => {
+      document.getElementById("session-select").value = "";
+      document.getElementById("session-day").value = "Monday";
+      document.getElementById("session-start").value = "";
+      document.getElementById("session-end").value = "";
+      document.getElementById("session-duration").value = 60;
+      document.getElementById("session-student").value = students[0]?.id || "";
+      document.getElementById("session-rate").value = "";
+      document.getElementById("session-subject").value = "";
+    });
+
+    document.getElementById("delete-session").addEventListener("click", () => {
+      const id = document.getElementById("session-select").value;
+      if (!id) return;
+      if (!confirm("Delete this session?")) return;
+      sessions = sessions.filter(s => s.id !== id);
+      saveToStorage();
+      populateSessionSelect();
+      renderAll();
+      document.getElementById("new-session").click();
+    });
+
+    // ==========
+    // ADMIN: GOALS
+    // ==========
+
+    document.getElementById("save-goals").addEventListener("click", () => {
+      goals.weeklyIncome = document.getElementById("goal-weekly-income").value;
+      goals.monthlyIncome = document.getElementById("goal-monthly-income").value;
+      goals.targetStudents = document.getElementById("goal-target-students").value;
+      goals.targetHours = document.getElementById("goal-target-hours").value;
+      goals.notes = document.getElementById("goal-notes").value;
+      saveToStorage();
+      renderGoals();
+    });
+
+    // ==========
+    // ADMIN: LESSONS
+    // ==========
+
+    document.getElementById("lesson-select").addEventListener("change", e => {
+      const idx = Number(e.target.value);
+      if (!Number.isNaN(idx)) fillLessonFormIndex(idx);
+    });
+
+    document.getElementById("save-lesson").addEventListener("click", () => {
+      const sel = document.getElementById("lesson-select");
+      let idx = sel.value === "" ? -1 : Number(sel.value);
+      if (idx < 0 || idx >= lessons.length) {
+        idx = lessons.length;
+        lessons.push({});
+        sel.value = String(idx);
+      }
+      const l = lessons[idx];
+      l.date = document.getElementById("lesson-date").value || "";
+      l.studentId = document.getElementById("lesson-student").value || "";
+      l.subject = document.getElementById("lesson-subject").value || "";
+      l.topic = document.getElementById("lesson-topic").value || "";
+      l.homework = document.getElementById("lesson-homework").value || "";
+      l.notes = document.getElementById("lesson-notes").value || "";
+
+      saveToStorage();
+      populateLessonSelect();
+      renderLessonsTable();
+    });
+
+    document.getElementById("new-lesson").addEventListener("click", () => {
+      document.getElementById("lesson-select").value = "";
+      document.getElementById("lesson-date").value = "";
+      document.getElementById("lesson-student").value = students[0]?.id || "";
+      document.getElementById("lesson-subject").value = "";
+      document.getElementById("lesson-topic").value = "";
+      document.getElementById("lesson-homework").value = "";
+      document.getElementById("lesson-notes").value = "";
+    });
+
+    document.getElementById("delete-lesson").addEventListener("click", () => {
+      const sel = document.getElementById("lesson-select");
+      if (sel.value === "") return;
+      const idx = Number(sel.value);
+      if (!confirm("Delete this lesson entry?")) return;
+      lessons.splice(idx, 1);
+      saveToStorage();
+      populateLessonSelect();
+      renderLessonsTable();
+      document.getElementById("new-lesson").click();
+    });
+
+    // ==========
+    // RENDER ALL
+    // ==========
+
+    function renderAll() {
       renderOverview();
       renderStudentsTable();
       renderScheduleTable();
       renderPaymentsTable();
-      renderGoalsStats();
-      initCharts();
+      renderLessonsTable();
+      renderGoals();
+    }
+
+    function init() {
+      loadFromStorage();
+      populateStudentSelects();
+      populateSessionSelect();
+      populateLessonSelect();
+      fillStudentFormById(students[0]?.id);
+      document.getElementById("student-select").value = students[0]?.id || "";
+      fillGoalsForm();
+      if (students[0]) {
+        document.getElementById("session-student").value = students[0].id;
+        document.getElementById("lesson-student").value = students[0].id;
+      }
+      renderAll();
       setActiveSection("overview");
     }
 
@@ -1427,3 +1899,4 @@
   </script>
 </body>
 </html>
+
