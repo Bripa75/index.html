@@ -1,762 +1,1400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tutoring Dashboard</title>
-
-<style>
-
-/* ========== GLOBAL STYLES ========== */
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background: #0d0d0d;
-  color: white;
-}
-
-header {
-  background: #111;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #222;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: bold;
-}
-
-button.edit-toggle {
-  padding: 10px 18px;
-  background: #0077ff;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-/* DASHBOARD GRID */
-
-.dashboard-container {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.card {
-  background: #161616;
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid #222;
-}
-
-.card h2 {
-  margin-top: 0;
-  font-size: 20px;
-}
-
-/* TABLE STYLES */
-
-.table-wrapper {
-  margin-top: 15px;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: white;
-}
-
-table th, table td {
-  padding: 10px;
-  border-bottom: 1px solid #333;
-  text-align: left;
-}
-
-/* CHART AREA */
-#revenueChart, #studentsChart {
-  width: 100%;
-  height: 240px;
-}
-
-/* ADMIN PANEL */
-
-#adminPanel {
-  position: fixed;
-  right: -420px;
-  top: 0;
-  width: 420px;
-  height: 100%;
-  background: #111;
-  border-left: 1px solid #333;
-  padding: 20px;
-  overflow-y: auto;
-  transition: right 0.35s ease;
-  z-index: 99;
-}
-
-#adminPanel.open {
-  right: 0;
-}
-
-.admin-section {
-  margin-bottom: 30px;
-}
-
-.admin-section h3 {
-  margin-top: 20px;
-  font-size: 18px;
-}
-
-input, select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 6px;
-  margin-bottom: 12px;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  color: white;
-  border-radius: 5px;
-}
-
-button.save-btn {
-  background: #28a745;
-  padding: 10px;
-  border: none;
-  color: white;
-  width: 100%;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-button.delete-btn {
-  background: #cc0000;
-  padding: 10px;
-  border: none;
-  color: white;
-  width: 100%;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-</style>
-</head>
-
-<body>
-
-<header>
-  <h1>Brian's Tutoring Dashboard</h1>
-  <button class="edit-toggle" onclick="toggleAdminPanel()">🔧 Edit Dashboard</button>
-</header>
-
-<div class="dashboard-container">
-
-  <!-- STUDENTS CARD -->
-  <div class="card">
-    <h2>Students</h2>
-    <div class="table-wrapper">
-      <table id="studentsTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Grade</th>
-            <th>Rate</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- WEEKLY SCHEDULE -->
-  <div class="card">
-    <h2>Weekly Schedule</h2>
-    <div class="table-wrapper">
-      <table id="scheduleTable">
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Student</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- WEEKLY REVENUE -->
-  <div class="card">
-    <h2>Weekly Revenue</h2>
-    <p id="weeklyExpected"></p>
-    <p id="weeklyCollected"></p>
-    <p id="weeklyOutstanding"></p>
-    <canvas id="revenueChart"></canvas>
-  </div>
-
-</div>
-
-<!-- ADMIN PANEL -->
-<div id="adminPanel">
-  <h2>Admin Controls</h2>
-
-  <div class="admin-section" id="studentEditor">
-    <h3>Students</h3>
-    <select id="studentSelect"></select>
-
-    <input id="studentName" placeholder="Student Name" />
-    <input id="studentGrade" placeholder="Grade" />
-    <input id="studentRate" placeholder="Rate ($/hr)" />
-
-    <button class="save-btn" onclick="saveStudent()">Save Student</button>
-    <button class="delete-btn" onclick="deleteStudent()">Delete Student</button>
-
-    <hr />
-    <h3>Add New Student</h3>
-    <input id="newStudentName" placeholder="Name" />
-    <input id="newStudentGrade" placeholder="Grade" />
-    <input id="newStudentRate" placeholder="Rate ($/hr)" />
-    <button class="save-btn" onclick="addStudent()">Add Student</button>
-  </div>
-
-  <div class="admin-section" id="paymentsEditor">
-    <h3>Payments</h3>
-    <select id="paymentStudent"></select>
-
-    <input id="paymentExpected" disabled />
-    <input id="paymentPaid" placeholder="Paid Amount" />
-    <input id="paymentPrepaid" placeholder="Prepaid Amount" />
-    <select id="paymentStatus">
-      <option value="paid">Paid</option>
-      <option value="partial">Partial</option>
-      <option value="notpaid">Not Paid</option>
-    </select>
-
-    <input id="paymentNotes" placeholder="Notes" />
-    <button class="save-btn" onclick="savePayment()">Save Payment</button>
-  </div>
-</div>
-<script>
-// =====================
-// DATA & LOCAL STORAGE
-// =====================
-
-const STORAGE_STUDENTS = "tutoring_students_v1";
-const STORAGE_SCHEDULE = "tutoring_schedule_v1";
-const STORAGE_PAYMENTS = "tutoring_payments_v1";
-
-// Default students
-let students = [
-  { id: "diana",    name: "Diana",    grade: "4th",   rate: 40 },
-  { id: "lucas",    name: "Lucas",    grade: "6th",   rate: 45 },
-  { id: "eva",      name: "Eva",      grade: "4th",   rate: 27 }, // 40-min flat
-  { id: "milana",   name: "Milana",   grade: "4th",   rate: 45 },
-  { id: "leo",      name: "Leo",      grade: "1st",   rate: 30 },
-  { id: "steph",    name: "Stephanie",grade: "4th",   rate: 35 },
-  { id: "gabriel",  name: "Gabriel",  grade: "College",rate: 60 },
-  { id: "maksim",   name: "Maksim",   grade: "7th",   rate: 65 },
-  { id: "savion",   name: "Savion",   grade: "College",rate: 60 },
-  { id: "eric",     name: "Eric",     grade: "College",rate: 75 },
-  { id: "timothy",  name: "Timothy",  grade: "4th",   rate: 60 },
-];
-
-// Default weekly schedule (per session)
-let schedule = [
-  // Monday
-  { id: "mon-diana",   day: "Monday",    studentId: "diana",   time: "6:30 – 7:30 pm", durationHours: 1 },
-
-  // Tuesday
-  { id: "tue-eva",     day: "Tuesday",   studentId: "eva",     time: "4:20 – 5:00 pm", durationHours: 40/60 },
-  { id: "tue-lucas",   day: "Tuesday",   studentId: "lucas",   time: "5:00 – 6:00 pm", durationHours: 1 },
-  { id: "tue-timothy", day: "Tuesday",   studentId: "timothy", time: "7:00 – 8:00 pm", durationHours: 1 },
-
-  // Thursday
-  { id: "thu-leo",     day: "Thursday",  studentId: "leo",     time: "3:00 – 4:00 pm", durationHours: 1 },
-  { id: "thu-lucas",   day: "Thursday",  studentId: "lucas",   time: "5:00 – 6:00 pm", durationHours: 1 },
-  { id: "thu-steph",   day: "Thursday",  studentId: "steph",   time: "6:00 – 7:00 pm", durationHours: 1 },
-
-  // Friday
-  { id: "fri-savion",  day: "Friday",    studentId: "savion",  time: "(time TBD)",      durationHours: 1 },
-  { id: "fri-gab",     day: "Friday",    studentId: "gabriel", time: "1:00 – 2:00 pm (Calc)", durationHours: 1, rateOverride: 60 },
-  { id: "fri-leo",     day: "Friday",    studentId: "leo",     time: "3:00 – 4:00 pm",  durationHours: 1 },
-  { id: "fri-diana",   day: "Friday",    studentId: "diana",   time: "4:00 – 5:00 pm",  durationHours: 1 },
-  { id: "fri-maksim",  day: "Friday",    studentId: "maksim",  time: "5:00 – 6:00 pm",  durationHours: 1 },
-
-  // Saturday
-  { id: "sat-milana",  day: "Saturday",  studentId: "milana",  time: "11:00 – 12:00 pm",durationHours: 1 },
-
-  // Sunday
-  { id: "sun-maksim",  day: "Sunday",    studentId: "maksim",  time: "10:00 – 11:00 am",durationHours: 1 },
-  { id: "sun-eric",    day: "Sunday",    studentId: "eric",    time: "11:00 – 12:00 pm",durationHours: 1 },
-  // Gabriel history @ 85/hr
-  { id: "sun-gab-hist",day: "Sunday",    studentId: "gabriel", time: "12:00 – 1:00 pm (History)", durationHours: 1, rateOverride: 85 },
-];
-
-// payments[weekKey][studentId] = { expected, paid, prepaid, status, notes }
-let payments = {};
-
-// ------------- Helpers for localStorage -------------
-
-function loadData() {
-  try {
-    const s = localStorage.getItem(STORAGE_STUDENTS);
-    const sch = localStorage.getItem(STORAGE_SCHEDULE);
-    const pay = localStorage.getItem(STORAGE_PAYMENTS);
-    if (s) students = JSON.parse(s);
-    if (sch) schedule = JSON.parse(sch);
-    if (pay) payments = JSON.parse(pay);
-  } catch (e) {
-    console.error("Error loading from localStorage, using defaults.", e);
-  }
-}
-
-function saveData() {
-  localStorage.setItem(STORAGE_STUDENTS, JSON.stringify(students));
-  localStorage.setItem(STORAGE_SCHEDULE, JSON.stringify(schedule));
-  localStorage.setItem(STORAGE_PAYMENTS, JSON.stringify(payments));
-}
-
-// ================ WEEK KEY (MONDAY START) =================
-
-function getMondayStart(date) {
-  const d = new Date(date);
-  const day = d.getDay(); // 0 Sun, 1 Mon, ...
-  const diff = (day === 0 ? -6 : 1) - day;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0,0,0,0);
-  return d;
-}
-
-function formatDateKey(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function getCurrentWeekKey() {
-  return formatDateKey(getMondayStart(new Date()));
-}
-
-// ============ COMPUTE EXPECTED REVENUE ===================
-
-function getStudentById(id) {
-  return students.find(s => s.id === id);
-}
-
-function computeExpectedForStudent(studentId) {
-  const st = getStudentById(studentId);
-  if (!st) return 0;
-  let total = 0;
-  for (const sess of schedule) {
-    if (sess.studentId !== studentId) continue;
-
-    // Eva: flat $27 per 40-min session
-    if (studentId === "eva") {
-      total += 27;
-    } else {
-      const rate = (sess.rateOverride != null) ? sess.rateOverride : st.rate;
-      const hours = sess.durationHours || 1;
-      total += rate * hours;
-    }
-  }
-  return total;
-}
-
-function computeWeeklyTotals() {
-  const weekKey = getCurrentWeekKey();
-  let expectedTotal = 0;
-  let collectedTotal = 0;
-
-  for (const st of students) {
-    const exp = computeExpectedForStudent(st.id);
-    expectedTotal += exp;
-
-    const wk = payments[weekKey] || {};
-    const rec = wk[st.id] || {};
-    const paid = Number(rec.paid || 0);
-    const prepaid = Number(rec.prepaid || 0);
-    collectedTotal += (paid + prepaid);
-  }
-
-  return {
-    expected: expectedTotal,
-    collected: collectedTotal,
-    outstanding: Math.max(0, expectedTotal - collectedTotal)
-  };
-}
-
-// month/year totals (very simple: sum over all saved weeks)
-function computeMonthYearTotals() {
-  const now = new Date();
-  const thisMonth = now.getMonth();
-  const thisYear = now.getFullYear();
-
-  let monthExpected = 0;
-  let monthCollected = 0;
-  let yearExpected = 0;
-  let yearCollected = 0;
-
-  for (const [weekKey, recs] of Object.entries(payments)) {
-    const d = new Date(weekKey);
-    if (isNaN(d)) continue;
-
-    let weekExpected = 0;
-    let weekCollected = 0;
-    for (const [studentId, r] of Object.entries(recs)) {
-      const exp = Number(r.expected || computeExpectedForStudent(studentId));
-      const paid = Number(r.paid || 0);
-      const prepaid = Number(r.prepaid || 0);
-      weekExpected += exp;
-      weekCollected += (paid + prepaid);
+  <meta charset="UTF-8" />
+  <title>Ripa Elevate – Tutoring Ops Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-main: #020617;
+      --bg-elevated: #02081f;
+      --bg-card: #020b2a;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.35);
+      --accent-alt: #06b6d4;
+      --accent-alt-soft: rgba(6, 182, 212, 0.25);
+      --danger: #f97373;
+      --success: #22c55e;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.25);
+      --radius-lg: 18px;
+      --shadow-soft: 0 0 35px rgba(15, 23, 42, 0.9);
+      --shadow-neon: 0 0 35px rgba(79, 70, 229, 0.35);
     }
 
-    if (d.getFullYear() === thisYear) {
-      yearExpected += weekExpected;
-      yearCollected += weekCollected;
-      if (d.getMonth() === thisMonth) {
-        monthExpected += weekExpected;
-        monthCollected += weekCollected;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #0b1120, #020617 50%, #000);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* --------- APP LAYOUT --------- */
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.95),
+        rgba(9, 9, 11, 0.98)
+      );
+      border-right: 1px solid rgba(51, 65, 85, 0.8);
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(24px);
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-orb {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, #4f46e5 55%, #0f172a);
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.7);
+    }
+
+    .logo-text-main {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .logo-text-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-item {
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: default;
+    }
+
+    .nav-item.active {
+      background: radial-gradient(circle at 0 0, var(--accent-soft), transparent);
+      color: #f9fafb;
+      border: 1px solid var(--accent-soft);
+      box-shadow: 0 0 20px rgba(79, 70, 229, 0.55);
+    }
+
+    .nav-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent-alt);
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.8);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      padding-top: 12px;
+    }
+
+    .sidebar-footer span {
+      color: #e5e7eb;
+    }
+
+    /* --------- MAIN PANEL --------- */
+
+    .main-panel {
+      padding: 20px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow: hidden;
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .main-title-block h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.02em;
+    }
+
+    .main-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      box-shadow: 0 0 18px rgba(15, 23, 42, 0.8);
+    }
+
+    .pill-dot-live {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.9);
+    }
+
+    .edit-button {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.9);
+      background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.6), #020617);
+      color: #e5e7eb;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 26px rgba(37, 99, 235, 0.55);
+    }
+
+    .edit-button span.icon {
+      font-size: 14px;
+    }
+
+    /* --------- STATS ROW --------- */
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: radial-gradient(circle at 0 0, var(--accent-soft), #020617);
+      border-radius: var(--radius-lg);
+      padding: 12px 15px;
+      border: 1px solid rgba(79, 70, 229, 0.6);
+      box-shadow: var(--shadow-neon);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:nth-child(2) {
+      background: radial-gradient(circle at 0 0, var(--accent-alt-soft), #020617);
+      border-color: rgba(56, 189, 248, 0.7);
+    }
+
+    .stat-card:nth-child(3) {
+      background: radial-gradient(circle at 0 0, rgba(16, 185, 129, 0.3), #020617);
+      border-color: rgba(16, 185, 129, 0.8);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: rgba(209, 213, 219, 0.9);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .stat-chip {
+      position: absolute;
+      right: 14px;
+      top: 10px;
+      font-size: 11px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--text-muted);
+    }
+
+    /* --------- MAIN GRID --------- */
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1.3fr 1.2fr 1.3fr;
+      gap: 14px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .card {
+      background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.26), #020617);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px 12px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .table-wrapper {
+      margin-top: 6px;
+      flex: 1;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      color: var(--text-main);
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    th,
+    td {
+      padding: 7px 6px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.8);
+    }
+
+    th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    tbody tr:hover {
+      background: rgba(37, 99, 235, 0.18);
+    }
+
+    /* --------- REVENUE CARD --------- */
+
+    .revenue-metrics {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .revenue-metrics span strong {
+      color: #e5e7eb;
+    }
+
+    #revenueChart {
+      width: 100%;
+      height: 220px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.32), #020617);
+      box-shadow: 0 0 32px rgba(37, 99, 235, 0.5);
+    }
+
+    .owe-list {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .owe-list strong {
+      color: #fecaca;
+    }
+
+    /* --------- ADMIN PANEL (SLIDE-OVER) --------- */
+
+    #adminPanel {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 420px;
+      height: 100vh;
+      background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.26), #020617);
+      border-left: 1px solid rgba(55, 65, 81, 0.95);
+      box-shadow: -10px 0 40px rgba(15, 23, 42, 0.95);
+      padding: 16px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: right 0.32s ease-out;
+      z-index: 50;
+    }
+
+    #adminPanel.open {
+      right: 0;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .admin-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .admin-close-btn {
+      border-radius: 999px;
+      padding: 5px 9px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .admin-section {
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      box-shadow: 0 0 20px rgba(15, 23, 42, 0.7);
+    }
+
+    .admin-section h3 {
+      margin: 0 0 4px;
+      font-size: 13px;
+    }
+
+    .admin-section small {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    label {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 7px;
+      margin-bottom: 1px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 7px 8px;
+      font-size: 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      color: #e5e7eb;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(59, 130, 246, 0.9);
+      box-shadow: 0 0 14px rgba(59, 130, 246, 0.55);
+    }
+
+    .btn-primary,
+    .btn-danger {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      color: white;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 0 22px rgba(34, 197, 94, 0.8);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      box-shadow: 0 0 22px rgba(239, 68, 68, 0.75);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      margin-top: 8px;
+      padding: 7px 9px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      cursor: pointer;
+    }
+
+    /* Small tweaks for scroll */
+    .admin-scroll {
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    /* Responsive-ish: collapse to two columns if needed */
+    @media (max-width: 1150px) {
+      .app-shell {
+        grid-template-columns: 220px minmax(0, 1fr);
+      }
+      .grid-main {
+        grid-template-columns: 1.2fr 1.2fr;
+        grid-auto-rows: minmax(0, auto);
       }
     }
-  }
-
-  return {
-    monthExpected,
-    monthCollected,
-    monthOutstanding: Math.max(0, monthExpected - monthCollected),
-    yearExpected,
-    yearCollected,
-    yearOutstanding: Math.max(0, yearExpected - yearCollected)
-  };
-}
-
-// ================== RENDER TABLES ========================
-
-function renderStudentsTable() {
-  const tbody = document.querySelector("#studentsTable tbody");
-  tbody.innerHTML = "";
-  students.forEach(st => {
-    const tr = document.createElement("tr");
-    const tdName = document.createElement("td");
-    const tdGrade = document.createElement("td");
-    const tdRate = document.createElement("td");
-
-    tdName.textContent = st.name;
-    tdGrade.textContent = st.grade;
-    tdRate.textContent = st.id === "eva" ? "$27 / 40 min" : `$${st.rate} / hr`;
-
-    tr.appendChild(tdName);
-    tr.appendChild(tdGrade);
-    tr.appendChild(tdRate);
-    tbody.appendChild(tr);
-  });
-}
-
-function renderScheduleTable() {
-  const tbody = document.querySelector("#scheduleTable tbody");
-  tbody.innerHTML = "";
-
-  // sort by day order
-  const dayOrder = { Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6, Sunday:7 };
-  const sorted = [...schedule].sort((a,b) => (dayOrder[a.day] || 10) - (dayOrder[b.day] || 10));
-
-  sorted.forEach(sess => {
-    const st = getStudentById(sess.studentId);
-    const tr = document.createElement("tr");
-
-    const tdDay = document.createElement("td");
-    const tdStudent = document.createElement("td");
-    const tdTime = document.createElement("td");
-
-    tdDay.textContent = sess.day;
-    tdStudent.textContent = st ? st.name : "(unknown)";
-    tdTime.textContent = sess.time;
-
-    tr.appendChild(tdDay);
-    tr.appendChild(tdStudent);
-    tr.appendChild(tdTime);
-    tbody.appendChild(tr);
-  });
-}
-
-// ================== REVENUE SUMMARY ======================
-
-function renderRevenueSummary() {
-  const weekTotals = computeWeeklyTotals();
-  const monthYearTotals = computeMonthYearTotals();
-
-  const weeklyExpectedEl = document.getElementById("weeklyExpected");
-  const weeklyCollectedEl = document.getElementById("weeklyCollected");
-  const weeklyOutstandingEl = document.getElementById("weeklyOutstanding");
-
-  weeklyExpectedEl.textContent = `Expected this week: $${weekTotals.expected.toFixed(2)}`;
-  weeklyCollectedEl.textContent =
-    `Collected this week: $${weekTotals.collected.toFixed(2)} ` +
-    `(Month collected: $${monthYearTotals.monthCollected.toFixed(2)}, ` +
-    `Year collected: $${monthYearTotals.yearCollected.toFixed(2)})`;
-  weeklyOutstandingEl.textContent =
-    `Outstanding this week: $${weekTotals.outstanding.toFixed(2)} ` +
-    `(Month outstanding: $${monthYearTotals.monthOutstanding.toFixed(2)}, ` +
-    `Year outstanding: $${monthYearTotals.yearOutstanding.toFixed(2)})`;
-
-  drawRevenueChart();
-}
-
-// ============== SIMPLE BAR CHART (NO LIBRARY) ============
-
-function drawRevenueChart() {
-  const canvas = document.getElementById("revenueChart");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-
-  // resize to actual CSS size
-  const w = canvas.clientWidth || 300;
-  const h = canvas.clientHeight || 200;
-  canvas.width = w;
-  canvas.height = h;
-
-  ctx.clearRect(0, 0, w, h);
-
-  // build expected per student
-  const data = students.map(st => ({
-    name: st.name,
-    value: computeExpectedForStudent(st.id)
-  })).filter(d => d.value > 0);
-
-  if (data.length === 0) {
-    ctx.fillStyle = "#888";
-    ctx.font = "14px Arial";
-    ctx.fillText("No data available yet.", 10, 30);
-    return;
-  }
-
-  const maxVal = Math.max(...data.map(d => d.value), 50);
-  const padding = 30;
-  const barWidth = (w - padding * 2) / data.length;
-
-  // axis
-  ctx.strokeStyle = "#555";
-  ctx.beginPath();
-  ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, h - padding);
-  ctx.lineTo(w - padding, h - padding);
-  ctx.stroke();
-
-  // bars
-  ctx.fillStyle = "#0077ff";
-  data.forEach((d, i) => {
-    const x = padding + i * barWidth + barWidth * 0.2;
-    const barHeight = (d.value / maxVal) * (h - padding * 2 - 10);
-    const y = (h - padding) - barHeight;
-    ctx.fillRect(x, y, barWidth * 0.6, barHeight);
-
-    // label
-    ctx.fillStyle = "#ccc";
-    ctx.font = "10px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(d.name, x + barWidth * 0.3, h - padding + 12);
-
-    ctx.fillStyle = "#0077ff";
-  });
-}
-
-// ===================== ADMIN PANEL =======================
-
-function toggleAdminPanel() {
-  const panel = document.getElementById("adminPanel");
-  panel.classList.toggle("open");
-}
-
-// ------- Admin: populate selects -------
-
-function populateStudentSelects() {
-  const studentSelect = document.getElementById("studentSelect");
-  const paymentStudent = document.getElementById("paymentStudent");
-
-  studentSelect.innerHTML = "";
-  paymentStudent.innerHTML = "";
-
-  students.forEach(st => {
-    const opt1 = document.createElement("option");
-    opt1.value = st.id;
-    opt1.textContent = st.name;
-    studentSelect.appendChild(opt1);
-
-    const opt2 = document.createElement("option");
-    opt2.value = st.id;
-    opt2.textContent = st.name;
-    paymentStudent.appendChild(opt2);
-  });
-
-  if (students.length > 0) {
-    studentSelect.value = students[0].id;
-    paymentStudent.value = students[0].id;
-    loadStudentIntoForm(students[0].id);
-    loadPaymentIntoForm(students[0].id);
-  }
-}
-
-function loadStudentIntoForm(studentId) {
-  const st = getStudentById(studentId);
-  if (!st) return;
-  document.getElementById("studentName").value = st.name;
-  document.getElementById("studentGrade").value = st.grade;
-  document.getElementById("studentRate").value = st.rate;
-}
-
-function loadPaymentIntoForm(studentId) {
-  const weekKey = getCurrentWeekKey();
-  const weekRecs = payments[weekKey] || {};
-  const rec = weekRecs[studentId] || {};
-
-  const expected = computeExpectedForStudent(studentId);
-
-  document.getElementById("paymentExpected").value = `Expected: $${expected.toFixed(2)}`;
-  document.getElementById("paymentPaid").value = rec.paid ?? "";
-  document.getElementById("paymentPrepaid").value = rec.prepaid ?? "";
-  document.getElementById("paymentStatus").value = rec.status || "notpaid";
-  document.getElementById("paymentNotes").value = rec.notes || "";
-}
-
-// ------- Admin: student actions -------
-
-function saveStudent() {
-  const select = document.getElementById("studentSelect");
-  const id = select.value;
-  if (!id) return;
-
-  const st = getStudentById(id);
-  if (!st) return;
-
-  st.name = document.getElementById("studentName").value || st.name;
-  st.grade = document.getElementById("studentGrade").value || st.grade;
-  st.rate = Number(document.getElementById("studentRate").value || st.rate);
-
-  saveData();
-  renderStudentsTable();
-  renderRevenueSummary();
-  populateStudentSelects(); // refresh names in dropdowns
-}
-
-function deleteStudent() {
-  const select = document.getElementById("studentSelect");
-  const id = select.value;
-  if (!id) return;
-  if (!confirm("Delete this student and any schedule/payment data for them?")) return;
-
-  students = students.filter(s => s.id !== id);
-  schedule = schedule.filter(s => s.studentId !== id);
-
-  // Remove from all payment weeks
-  for (const [weekKey, recs] of Object.entries(payments)) {
-    if (recs[id]) delete recs[id];
-  }
-
-  saveData();
-  renderStudentsTable();
-  renderScheduleTable();
-  renderRevenueSummary();
-  populateStudentSelects();
-}
-
-function addStudent() {
-  const name = document.getElementById("newStudentName").value.trim();
-  const grade = document.getElementById("newStudentGrade").value.trim() || "Unknown";
-  const rateVal = document.getElementById("newStudentRate").value.trim();
-
-  if (!name) {
-    alert("Please enter a name for the new student.");
-    return;
-  }
-
-  const id = "s" + Date.now();
-  const rate = Number(rateVal || 0);
-
-  students.push({ id, name, grade, rate });
-
-  document.getElementById("newStudentName").value = "";
-  document.getElementById("newStudentGrade").value = "";
-  document.getElementById("newStudentRate").value = "";
-
-  saveData();
-  renderStudentsTable();
-  populateStudentSelects();
-  renderRevenueSummary();
-}
-
-// ------- Admin: payment actions -------
-
-function savePayment() {
-  const studentId = document.getElementById("paymentStudent").value;
-  if (!studentId) return;
-  const weekKey = getCurrentWeekKey();
-
-  const paidStr = document.getElementById("paymentPaid").value;
-  const prepaidStr = document.getElementById("paymentPrepaid").value;
-  const status = document.getElementById("paymentStatus").value;
-  const notes = document.getElementById("paymentNotes").value;
-
-  const paid = Number(paidStr || 0);
-  const prepaid = Number(prepaidStr || 0);
-  const expected = computeExpectedForStudent(studentId);
-
-  if (!payments[weekKey]) payments[weekKey] = {};
-  payments[weekKey][studentId] = {
-    expected,
-    paid,
-    prepaid,
-    status,
-    notes
-  };
-
-  saveData();
-  renderRevenueSummary();
-  loadPaymentIntoForm(studentId);
-}
-
-// ==================== INIT ==============================
-
-function attachEvents() {
-  const studentSelect = document.getElementById("studentSelect");
-  const paymentStudent = document.getElementById("paymentStudent");
-
-  studentSelect.addEventListener("change", () => {
-    loadStudentIntoForm(studentSelect.value);
-  });
-
-  paymentStudent.addEventListener("change", () => {
-    loadPaymentIntoForm(paymentStudent.value);
-  });
-
-  // redraw chart on resize so it fits
-  window.addEventListener("resize", () => {
-    renderRevenueSummary();
-  });
-}
-
-function init() {
-  loadData();
-  renderStudentsTable();
-  renderScheduleTable();
-  populateStudentSelects();
-  renderRevenueSummary();
-  attachEvents();
-}
-
-document.addEventListener("DOMContentLoaded", init);
-</script>
 
+    @media (max-width: 900px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .grid-main {
+        grid-template-columns: 1fr;
+      }
+      .stat-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo-block">
+        <div class="logo-orb"></div>
+        <div>
+          <div class="logo-text-main">Ripa Elevate Academy</div>
+          <div class="logo-text-sub">Neon AI Tutoring Ops</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li class="nav-item active">
+            <span class="nav-dot"></span> Overview
+          </li>
+          <li class="nav-item">Students &amp; Grades</li>
+          <li class="nav-item">Schedule</li>
+          <li class="nav-item">Payments</li>
+          <li class="nav-item">Goals &amp; Growth</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        Private dashboard for <span>Brian</span>.<br />
+        Data stored locally (in your browser).<br />
+        <span>No external database.</span>
+      </div>
+    </aside>
+
+    <!-- MAIN PANEL -->
+    <main class="main-panel">
+      <header class="main-header">
+        <div class="main-title-block">
+          <h1>Overview</h1>
+          <div class="main-subtitle">Live, AI-style snapshot of your tutoring business.</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+          <div class="header-meta">
+            <span class="pill">
+              <span class="pill-dot-live"></span>
+              This week: <span id="weekRangeLabel"></span>
+            </span>
+          </div>
+          <button class="edit-button" onclick="toggleAdminPanel()">
+            <span class="icon">⚙️</span>
+            Edit data / payments
+          </button>
+        </div>
+      </header>
+
+      <!-- TOP STATS -->
+      <section class="stat-row">
+        <article class="stat-card">
+          <div class="stat-label">Active Students</div>
+          <div class="stat-value" id="statActiveStudents">0</div>
+          <div class="stat-sub">Across elementary, middle, and college level.</div>
+          <div class="stat-chip" id="statGradeMix">Grade mix loading…</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Weekly Teaching Hours</div>
+          <div class="stat-value" id="statWeeklyHours">0 hrs</div>
+          <div class="stat-sub" id="statSessionsPerWeek">Sessions per week: —</div>
+          <div class="stat-chip">Zelle-based schedule</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Projected Weekly Revenue</div>
+          <div class="stat-value" id="statWeeklyRevenue">$0.00</div>
+          <div class="stat-sub" id="statMonthYearLabel">Month &amp; year totals loading…</div>
+          <div class="stat-chip">AI-style estimate</div>
+        </article>
+      </section>
+
+      <!-- MAIN GRID -->
+      <section class="grid-main">
+        <!-- STUDENTS -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">Students</div>
+            <div class="card-subtitle" id="studentsSummary">—</div>
+          </div>
+          <div class="table-wrapper">
+            <table id="studentsTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Grade</th>
+                  <th>Rate</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- SCHEDULE -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">Weekly Schedule</div>
+            <div class="card-subtitle">Based on your recurring sessions.</div>
+          </div>
+          <div class="table-wrapper">
+            <table id="scheduleTable">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Student</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- REVENUE -->
+        <article class="card">
+          <div class="card-header">
+            <div class="card-title">Revenue &amp; Payments</div>
+            <div class="card-subtitle">Live snapshot with who still owes this week.</div>
+          </div>
+          <div class="revenue-metrics">
+            <span id="weeklyExpected"></span>
+            <span id="weeklyCollected"></span>
+            <span id="weeklyOutstanding"></span>
+          </div>
+          <canvas id="revenueChart"></canvas>
+          <div class="owe-list" id="oweList"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <aside id="adminPanel">
+    <div class="admin-header">
+      <div>
+        <div class="admin-title">Edit Data &amp; Payments</div>
+        <div class="admin-caption">
+          Adjust students, add new ones, and track who paid for this week.
+        </div>
+      </div>
+      <button class="admin-close-btn" onclick="toggleAdminPanel()">Close</button>
+    </div>
+
+    <div class="admin-scroll">
+      <!-- STUDENT EDIT -->
+      <section class="admin-section">
+        <h3>Students</h3>
+        <small>Select a student to edit their info.</small>
+
+        <label for="studentSelect">Student</label>
+        <select id="studentSelect"></select>
+
+        <label for="studentName">Name</label>
+        <input id="studentName" placeholder="Student name" />
+
+        <label for="studentGrade">Grade</label>
+        <input id="studentGrade" placeholder="e.g., 4th, 6th, College" />
+
+        <label for="studentRate">Rate ($/hr)</label>
+        <input id="studentRate" placeholder="e.g., 45" />
+
+        <button class="btn-primary" onclick="saveStudent()">Save Student</button>
+        <button class="btn-danger" onclick="deleteStudent()">Delete Student</button>
+
+        <button class="btn-secondary" onclick="resetDefaults()">
+          Reset to built-in default students &amp; schedule
+        </button>
+      </section>
+
+      <!-- ADD STUDENT -->
+      <section class="admin-section">
+        <h3>Add New Student</h3>
+        <small>They’ll appear in the table and can be added to the schedule later.</small>
+
+        <label for="newStudentName">Name</label>
+        <input id="newStudentName" placeholder="New student name" />
+
+        <label for="newStudentGrade">Grade</label>
+        <input id="newStudentGrade" placeholder="e.g., 5th" />
+
+        <label for="newStudentRate">Rate ($/hr)</label>
+        <input id="newStudentRate" placeholder="e.g., 50" />
+
+        <button class="btn-primary" onclick="addStudent()">Add Student</button>
+      </section>
+
+      <!-- PAYMENTS -->
+      <section class="admin-section">
+        <h3>Payments for This Week</h3>
+        <small>
+          Track who paid via Zelle, who prepaid, and who still owes.
+          Values are per current week only.
+        </small>
+
+        <label for="paymentStudent">Student</label>
+        <select id="paymentStudent"></select>
+
+        <label for="paymentExpected">Expected</label>
+        <input id="paymentExpected" disabled />
+
+        <label for="paymentPaid">Paid this week</label>
+        <input id="paymentPaid" placeholder="e.g., 80" />
+
+        <label for="paymentPrepaid">Prepaid (future weeks)</label>
+        <input id="paymentPrepaid" placeholder="e.g., 200" />
+
+        <label for="paymentStatus">Status</label>
+        <select id="paymentStatus">
+          <option value="notpaid">Not Paid</option>
+          <option value="partial">Partial</option>
+          <option value="paid">Paid</option>
+        </select>
+
+        <label for="paymentNotes">Notes</label>
+        <input id="paymentNotes" placeholder="e.g., paid 4 weeks in advance" />
+
+        <button class="btn-primary" onclick="savePayment()">Save Payment</button>
+      </section>
+    </div>
+  </aside>
+
+  <script>
+    // ===================== DATA & LOCAL STORAGE =====================
+
+    const STORAGE_STUDENTS = "tutoring_students_v2";
+    const STORAGE_SCHEDULE = "tutoring_schedule_v2";
+    const STORAGE_PAYMENTS = "tutoring_payments_v2";
+
+    let studentsDefault = [
+      { id: "diana",   name: "Diana",   grade: "4th",    rate: 40 },
+      { id: "lucas",   name: "Lucas",   grade: "6th",    rate: 45 },
+      { id: "eva",     name: "Eva",     grade: "4th",    rate: 27 }, // flat per session
+      { id: "milana",  name: "Milana",  grade: "4th",    rate: 45 },
+      { id: "leo",     name: "Leo",     grade: "1st",    rate: 30 },
+      { id: "steph",   name: "Stephanie", grade: "4th",  rate: 35 },
+      { id: "gabriel", name: "Gabriel", grade: "College", rate: 60 },
+      { id: "maksim",  name: "Maksim",  grade: "7th",    rate: 65 },
+      { id: "savion",  name: "Savion",  grade: "College", rate: 60 },
+      { id: "eric",    name: "Eric",    grade: "College", rate: 75 },
+      { id: "timothy", name: "Timothy", grade: "4th",    rate: 60 },
+    ];
+
+    let scheduleDefault = [
+      // Monday
+      { id: "mon-diana",   day: "Monday",   studentId: "diana",   time: "6:30 – 7:30 pm", durationHours: 1 },
+      // Tuesday
+      { id: "tue-eva",     day: "Tuesday",  studentId: "eva",     time: "4:20 – 5:00 pm", durationHours: 40 / 60 },
+      { id: "tue-lucas",   day: "Tuesday",  studentId: "lucas",   time: "5:00 – 6:00 pm", durationHours: 1 },
+      { id: "tue-tim",     day: "Tuesday",  studentId: "timothy", time: "7:00 – 8:00 pm", durationHours: 1 },
+      // Thursday
+      { id: "thu-leo",     day: "Thursday", studentId: "leo",     time: "3:00 – 4:00 pm", durationHours: 1 },
+      { id: "thu-lucas",   day: "Thursday", studentId: "lucas",   time: "5:00 – 6:00 pm", durationHours: 1 },
+      { id: "thu-steph",   day: "Thursday", studentId: "steph",   time: "6:00 – 7:00 pm", durationHours: 1 },
+      // Friday
+      { id: "fri-sav",     day: "Friday",   studentId: "savion",  time: "(time TBD)",      durationHours: 1 },
+      { id: "fri-gab-c",   day: "Friday",   studentId: "gabriel", time: "1:00 – 2:00 pm (Calc)", durationHours: 1, rateOverride: 60 },
+      { id: "fri-leo",     day: "Friday",   studentId: "leo",     time: "3:00 – 4:00 pm",  durationHours: 1 },
+      { id: "fri-diana",   day: "Friday",   studentId: "diana",   time: "4:00 – 5:00 pm",  durationHours: 1 },
+      { id: "fri-maks",    day: "Friday",   studentId: "maksim",  time: "5:00 – 6:00 pm",  durationHours: 1 },
+      // Saturday
+      { id: "sat-mil",     day: "Saturday", studentId: "milana",  time: "11:00 – 12:00 pm", durationHours: 1 },
+      // Sunday
+      { id: "sun-maks",    day: "Sunday",   studentId: "maksim",  time: "10:00 – 11:00 am", durationHours: 1 },
+      { id: "sun-eric",    day: "Sunday",   studentId: "eric",    time: "11:00 – 12:00 pm", durationHours: 1 },
+      { id: "sun-gab-h",   day: "Sunday",   studentId: "gabriel", time: "12:00 – 1:00 pm (History)", durationHours: 1, rateOverride: 85 },
+    ];
+
+    let students = [];
+    let schedule = [];
+    // payments[weekKey][studentId] = { expected, paid, prepaid, status, notes }
+    let payments = {};
+
+    function loadData() {
+      try {
+        const s = localStorage.getItem(STORAGE_STUDENTS);
+        const sch = localStorage.getItem(STORAGE_SCHEDULE);
+        const pay = localStorage.getItem(STORAGE_PAYMENTS);
+        students = s ? JSON.parse(s) : JSON.parse(JSON.stringify(studentsDefault));
+        schedule = sch ? JSON.parse(sch) : JSON.parse(JSON.stringify(scheduleDefault));
+        payments = pay ? JSON.parse(pay) : {};
+      } catch (e) {
+        console.error("Error loading data, using defaults", e);
+        students = JSON.parse(JSON.stringify(studentsDefault));
+        schedule = JSON.parse(JSON.stringify(scheduleDefault));
+        payments = {};
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_STUDENTS, JSON.stringify(students));
+      localStorage.setItem(STORAGE_SCHEDULE, JSON.stringify(schedule));
+      localStorage.setItem(STORAGE_PAYMENTS, JSON.stringify(payments));
+    }
+
+    function resetDefaults() {
+      if (!confirm("Reset to built-in defaults? This will keep payments but overwrite students & schedule.")) return;
+      students = JSON.parse(JSON.stringify(studentsDefault));
+      schedule = JSON.parse(JSON.stringify(scheduleDefault));
+      saveData();
+      renderAll();
+      populateStudentSelects();
+    }
+
+    // ===================== DATE HELPERS =====================
+
+    function getMondayStart(date) {
+      const d = new Date(date);
+      const day = d.getDay(); // 0 Sun
+      const diff = (day === 0 ? -6 : 1) - day;
+      d.setDate(d.getDate() + diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function formatKey(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function getWeekKey() {
+      return formatKey(getMondayStart(new Date()));
+    }
+
+    function getWeekRangeLabel() {
+      const monday = getMondayStart(new Date());
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+
+      const opts = { month: "short", day: "numeric" };
+      return `${monday.toLocaleDateString(undefined, opts)} – ${sunday.toLocaleDateString(undefined, opts)}`;
+    }
+
+    // ===================== CORE LOOKUPS =====================
+
+    function getStudentById(id) {
+      return students.find((s) => s.id === id);
+    }
+
+    function computeExpectedForStudent(studentId) {
+      const st = getStudentById(studentId);
+      if (!st) return 0;
+      let total = 0;
+      for (const sess of schedule) {
+        if (sess.studentId !== studentId) continue;
+        if (studentId === "eva") {
+          total += 27; // per 40-min session flat
+        } else {
+          const rate = sess.rateOverride != null ? sess.rateOverride : st.rate;
+          const hours = sess.durationHours || 1;
+          total += rate * hours;
+        }
+      }
+      return total;
+    }
+
+    function computeWeeklyTotals() {
+      const key = getWeekKey();
+      const weekRecs = payments[key] || {};
+
+      let expectedTotal = 0;
+      let collectedTotal = 0;
+
+      for (const st of students) {
+        const expected = computeExpectedForStudent(st.id);
+        expectedTotal += expected;
+
+        const r = weekRecs[st.id] || {};
+        const paid = Number(r.paid || 0);
+        const prepaid = Number(r.prepaid || 0);
+        collectedTotal += paid + prepaid;
+      }
+      return {
+        expected: expectedTotal,
+        collected: collectedTotal,
+        outstanding: Math.max(0, expectedTotal - collectedTotal),
+      };
+    }
+
+    function computeMonthYearTotals() {
+      const now = new Date();
+      const thisMonth = now.getMonth();
+      const thisYear = now.getFullYear();
+
+      let monthExpected = 0,
+        monthCollected = 0,
+        yearExpected = 0,
+        yearCollected = 0;
+
+      for (const [weekKey, recs] of Object.entries(payments)) {
+        const d = new Date(weekKey);
+        if (isNaN(d)) continue;
+
+        let weekExpected = 0,
+          weekCollected = 0;
+        for (const [studentId, r] of Object.entries(recs)) {
+          const expected = Number(
+            r.expected || computeExpectedForStudent(studentId)
+          );
+          const paid = Number(r.paid || 0);
+          const prepaid = Number(r.prepaid || 0);
+          weekExpected += expected;
+          weekCollected += paid + prepaid;
+        }
+
+        if (d.getFullYear() === thisYear) {
+          yearExpected += weekExpected;
+          yearCollected += weekCollected;
+          if (d.getMonth() === thisMonth) {
+            monthExpected += weekExpected;
+            monthCollected += weekCollected;
+          }
+        }
+      }
+      return {
+        monthExpected,
+        monthCollected,
+        monthOutstanding: Math.max(0, monthExpected - monthCollected),
+        yearExpected,
+        yearCollected,
+        yearOutstanding: Math.max(0, yearExpected - yearCollected),
+      };
+    }
+
+    function computeWeeklyHoursAndSessions() {
+      let hours = 0;
+      let sessions = schedule.length;
+      for (const sess of schedule) {
+        hours += sess.durationHours || 1;
+      }
+      return { hours, sessions };
+    }
+
+    // ===================== RENDER TABLES & STATS =====================
+
+    function renderStudentsTable() {
+      const tbody = document.querySelector("#studentsTable tbody");
+      tbody.innerHTML = "";
+      students.forEach((s) => {
+        const tr = document.createElement("tr");
+        const tdName = document.createElement("td");
+        const tdGrade = document.createElement("td");
+        const tdRate = document.createElement("td");
+
+        tdName.textContent = s.name;
+        tdGrade.textContent = s.grade;
+        tdRate.textContent =
+          s.id === "eva" ? "$27 / 40 min" : `$${s.rate.toFixed(2)} / hr`;
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdGrade);
+        tr.appendChild(tdRate);
+        tbody.appendChild(tr);
+      });
+
+      const summary = document.getElementById("studentsSummary");
+      const grades = {};
+      for (const s of students) {
+        grades[s.grade] = (grades[s.grade] || 0) + 1;
+      }
+      const parts = Object.entries(grades).map(
+        ([g, count]) => `${g}: ${count}`
+      );
+      summary.textContent = parts.length
+        ? `Grade mix • ${parts.join(" • ")}`
+        : "No students yet.";
+    }
+
+    function renderScheduleTable() {
+      const tbody = document.querySelector("#scheduleTable tbody");
+      tbody.innerHTML = "";
+
+      const order = {
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6,
+        Sunday: 7,
+      };
+
+      const sorted = [...schedule].sort(
+        (a, b) => (order[a.day] || 10) - (order[b.day] || 10)
+      );
+
+      sorted.forEach((sess) => {
+        const st = getStudentById(sess.studentId);
+        const tr = document.createElement("tr");
+        const tdDay = document.createElement("td");
+        const tdName = document.createElement("td");
+        const tdTime = document.createElement("td");
+
+        tdDay.textContent = sess.day;
+        tdName.textContent = st ? st.name : "(deleted student)";
+        tdTime.textContent = sess.time;
+
+        tr.appendChild(tdDay);
+        tr.appendChild(tdName);
+        tr.appendChild(tdTime);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderStats() {
+      document.getElementById("weekRangeLabel").textContent =
+        getWeekRangeLabel();
+
+      // active students
+      document.getElementById("statActiveStudents").textContent =
+        students.length;
+
+      // weekly hours & sessions
+      const { hours, sessions } = computeWeeklyHoursAndSessions();
+      document.getElementById("statWeeklyHours").textContent =
+        hours.toFixed(2) + " hrs";
+      document.getElementById(
+        "statSessionsPerWeek"
+      ).textContent = `Sessions per week: ${sessions}`;
+
+      // weekly & month/year money
+      const weekTotals = computeWeeklyTotals();
+      const myTotals = computeMonthYearTotals();
+
+      document.getElementById(
+        "statWeeklyRevenue"
+      ).textContent = `$${weekTotals.expected.toFixed(2)}`;
+
+      document.getElementById(
+        "statMonthYearLabel"
+      ).textContent = `Collected this month: $${myTotals.monthCollected.toFixed(
+        2
+      )} • Year to date: $${myTotals.yearCollected.toFixed(2)}`;
+
+      // text metrics card
+      const weeklyExpectedEl = document.getElementById("weeklyExpected");
+      const weeklyCollectedEl = document.getElementById("weeklyCollected");
+      const weeklyOutstandingEl = document.getElementById("weeklyOutstanding");
+
+      weeklyExpectedEl.innerHTML = `<strong>Expected this week:</strong> $${weekTotals.expected.toFixed(
+        2
+      )}`;
+      weeklyCollectedEl.innerHTML = `<strong>Collected this week:</strong> $${weekTotals.collected.toFixed(
+        2
+      )} (month: $${myTotals.monthCollected.toFixed(
+        2
+      )}, year: $${myTotals.yearCollected.toFixed(2)})`;
+      weeklyOutstandingEl.innerHTML = `<strong>Outstanding this week:</strong> $${weekTotals.outstanding.toFixed(
+        2
+      )} (month: $${myTotals.monthOutstanding.toFixed(
+        2
+      )}, year: $${myTotals.yearOutstanding.toFixed(2)})`;
+
+      // little chip summary
+      const chip = document.getElementById("statGradeMix");
+      const grades = {};
+      for (const s of students) grades[s.grade] = (grades[s.grade] || 0) + 1;
+      chip.textContent = Object.entries(grades)
+        .map(([g, c]) => `${g}: ${c}`)
+        .join(" • ");
+    }
+
+    // ===================== WHO STILL OWES =====================
+
+    function renderOweList() {
+      const key = getWeekKey();
+      const weekRecs = payments[key] || {};
+      const list = [];
+
+      for (const st of students) {
+        const expected = computeExpectedForStudent(st.id);
+        if (expected <= 0) continue;
+        const r = weekRecs[st.id] || {};
+        const paid = Number(r.paid || 0) + Number(r.prepaid || 0);
+        const owed = expected - paid;
+        if (owed > 0.01) {
+          list.push({ name: st.name, owed });
+        }
+      }
+
+      const el = document.getElementById("oweList");
+      if (!list.length) {
+        el.innerHTML =
+          "<strong>Everyone is fully paid for this week 🎉</strong>";
+      } else {
+        const items = list
+          .map((x) => `${x.name}: <strong>$${x.owed.toFixed(2)}</strong>`)
+          .join(" • ");
+        el.innerHTML = `Still owes this week → ${items}`;
+      }
+    }
+
+    // ===================== SIMPLE BAR CHART =====================
+
+    function drawRevenueChart() {
+      const canvas = document.getElementById("revenueChart");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      const w = canvas.clientWidth || 300;
+      const h = canvas.clientHeight || 200;
+      canvas.width = w;
+      canvas.height = h;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const data = students
+        .map((st) => ({
+          name: st.name,
+          value: computeExpectedForStudent(st.id),
+        }))
+        .filter((d) => d.value > 0);
+
+      if (!data.length) {
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "12px system-ui";
+        ctx.fillText("No revenue data yet.", 16, 24);
+        return;
+      }
+
+      const maxVal = Math.max(...data.map((d) => d.value), 20);
+      const padding = 28;
+      const barWidth = (w - padding * 2) / data.length;
+
+      // axes
+      ctx.strokeStyle = "rgba(148,163,184,0.5)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, padding);
+      ctx.lineTo(padding, h - padding);
+      ctx.lineTo(w - padding, h - padding);
+      ctx.stroke();
+
+      // gradient for bars
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, "#4f46e5");
+      grad.addColorStop(1, "#06b6d4");
+
+      data.forEach((d, i) => {
+        const x = padding + i * barWidth + barWidth * 0.18;
+        const barHeight = (d.value / maxVal) * (h - padding * 2 - 10);
+        const y = h - padding - barHeight;
+
+        // glow
+        ctx.shadowColor = "rgba(56,189,248,0.9)";
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y, barWidth * 0.64, barHeight);
+
+        // label
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#e5e7eb";
+        ctx.font = "10px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText(d.name, x + barWidth * 0.32, h - padding + 12);
+
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "9px system-ui";
+        ctx.fillText(
+          "$" + d.value.toFixed(0),
+          x + barWidth * 0.32,
+          y - 4
+        );
+      });
+    }
+
+    // ===================== ADMIN PANEL FUNCTIONS =====================
+
+    function toggleAdminPanel() {
+      const panel = document.getElementById("adminPanel");
+      panel.classList.toggle("open");
+    }
+
+    function populateStudentSelects() {
+      const selEdit = document.getElementById("studentSelect");
+      const selPay = document.getElementById("paymentStudent");
+      selEdit.innerHTML = "";
+      selPay.innerHTML = "";
+
+      students.forEach((s) => {
+        const o1 = document.createElement("option");
+        o1.value = o1.textContent = s.id;
+        o1.textContent = s.name;
+        selEdit.appendChild(o1);
+
+        const o2 = document.createElement("option");
+        o2.value = s.id;
+        o2.textContent = s.name;
+        selPay.appendChild(o2);
+      });
+
+      if (students.length) {
+        selEdit.value = students[0].id;
+        selPay.value = students[0].id;
+        loadStudentIntoForm(students[0].id);
+        loadPaymentIntoForm(students[0].id);
+      }
+    }
+
+    function loadStudentIntoForm(id) {
+      const s = getStudentById(id);
+      if (!s) return;
+      document.getElementById("studentName").value = s.name;
+      document.getElementById("studentGrade").value = s.grade;
+      document.getElementById("studentRate").value = s.rate;
+    }
+
+    function loadPaymentIntoForm(id) {
+      const weekKey = getWeekKey();
+      const weekRecs = payments[weekKey] || {};
+      const rec = weekRecs[id] || {};
+      const expected = computeExpectedForStudent(id);
+
+      document.getElementById(
+        "paymentExpected"
+      ).value = `Expected: $${expected.toFixed(2)}`;
+      document.getElementById("paymentPaid").value = rec.paid ?? "";
+      document.getElementById("paymentPrepaid").value = rec.prepaid ?? "";
+      document.getElementById("paymentStatus").value =
+        rec.status || "notpaid";
+      document.getElementById("paymentNotes").value = rec.notes || "";
+    }
+
+    function saveStudent() {
+      const sel = document.getElementById("studentSelect");
+      const id = sel.value;
+      const s = getStudentById(id);
+      if (!s) return;
+
+      s.name = document.getElementById("studentName").value || s.name;
+      s.grade = document.getElementById("studentGrade").value || s.grade;
+      const rate = Number(document.getElementById("studentRate").value);
+      if (!Number.isNaN(rate) && rate > 0) s.rate = rate;
+
+      saveData();
+      renderAll();
+      populateStudentSelects();
+    }
+
+    function deleteStudent() {
+      const sel = document.getElementById("studentSelect");
+      const id = sel.value;
+      if (!id) return;
+      if (!confirm("Delete this student and any schedule entries for them?"))
+        return;
+
+      students = students.filter((s) => s.id !== id);
+      schedule = schedule.filter((sess) => sess.studentId !== id);
+
+      for (const wk of Object.values(payments)) {
+        if (wk[id]) delete wk[id];
+      }
+
+      saveData();
+      renderAll();
+      populateStudentSelects();
+    }
+
+    function addStudent() {
+      const name = document.getElementById("newStudentName").value.trim();
+      const grade = document
+        .getElementById("newStudentGrade")
+        .value.trim() || "Unknown";
+      const rateStr = document
+        .getElementById("newStudentRate")
+        .value.trim();
+
+      if (!name) {
+        alert("Please enter a name for the new student.");
+        return;
+      }
+      const rate = Number(rateStr || 0);
+      const id = "s" + Date.now();
+
+      students.push({ id, name, grade, rate });
+      document.getElementById("newStudentName").value = "";
+      document.getElementById("newStudentGrade").value = "";
+      document.getElementById("newStudentRate").value = "";
+
+      saveData();
+      renderAll();
+      populateStudentSelects();
+    }
+
+    function savePayment() {
+      const studentId = document.getElementById("paymentStudent").value;
+      if (!studentId) return;
+      const weekKey = getWeekKey();
+      if (!payments[weekKey]) payments[weekKey] = {};
+
+      const paid = Number(
+        document.getElementById("paymentPaid").value || 0
+      );
+      const prepaid = Number(
+        document.getElementById("paymentPrepaid").value || 0
+      );
+      const status = document.getElementById("paymentStatus").value;
+      const notes = document.getElementById("paymentNotes").value;
+      const expected = computeExpectedForStudent(studentId);
+
+      payments[weekKey][studentId] = {
+        expected,
+        paid,
+        prepaid,
+        status,
+        notes,
+      };
+
+      saveData();
+      renderAll();
+      loadPaymentIntoForm(studentId);
+    }
+
+    // ===================== INIT & EVENT BINDINGS =====================
+
+    function renderAll() {
+      renderStudentsTable();
+      renderScheduleTable();
+      renderStats();
+      renderOweList();
+      drawRevenueChart();
+    }
+
+    function attachEvents() {
+      document
+        .getElementById("studentSelect")
+        .addEventListener("change", (e) =>
+          loadStudentIntoForm(e.target.value)
+        );
+      document
+        .getElementById("paymentStudent")
+        .addEventListener("change", (e) =>
+          loadPaymentIntoForm(e.target.value)
+        );
+      window.addEventListener("resize", drawRevenueChart);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadData();
+      renderAll();
+      populateStudentSelects();
+      attachEvents();
+    });
+  </script>
 </body>
 </html>
-
-
