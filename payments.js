@@ -1,63 +1,66 @@
 /**************************************************
  * PAYMENT + EARNINGS ENGINE
+ * - Weekly resets
+ * - Month & year accumulate
+ * - Prepaid DOES count as revenue now
  **************************************************/
 
-// Monday = start of the week
 function getStartOfWeek() {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun, 1=Mon
-  const diff = now.getDate() - day + 1;
+  const day = now.getDay();   // 0=Sun, 1=Mon
+  const diff = now.getDate() - day + 1; // Monday as start
+  now.setHours(0, 0, 0, 0);
   return new Date(now.setDate(diff));
 }
 
-let startOfWeek = getStartOfWeek();
+function rolloverWeekIfNeeded() {
+  const now = new Date();
+  const weekKeyCurrent = getStartOfWeek().toDateString();
+  const monthCurrent = now.getMonth();
+  const yearCurrent  = now.getFullYear();
 
-/**************************************************
- * CALCULATE WEEKLY, MONTHLY & YEARLY EARNINGS
- **************************************************/
-function calculateEarnings() {
-  let weekly = 0;
-  let monthly = 0;
-  let yearly = 0;
+  // first ever load → just set baseline
+  if (!meta.weekKey) {
+    meta.weekKey = weekKeyCurrent;
+    meta.month   = monthCurrent;
+    meta.year    = yearCurrent;
+    saveAllData();
+    return;
+  }
 
-  payments.forEach(p => {
-    const amount = (p.paid || 0) + (p.prepaid || 0);
+  // calendar month changed → reset month counter
+  if (meta.year !== yearCurrent) {
+    earningsHistory.year = 0;
+    earningsHistory.month = 0;
+  } else if (meta.month !== monthCurrent) {
+    earningsHistory.month = 0;
+  }
 
-    weekly += amount;
-    monthly += amount;
-    yearly += amount;
-  });
+  // new week? → move last week's collected into history, then clear paid fields
+  if (meta.weekKey !== weekKeyCurrent) {
+    let lastWeekTotal = 0;
+    payments.forEach(p => {
+      lastWeekTotal += (p.paid || 0) + (p.prepaid || 0);
+      // reset weekly payment fields
+      p.paid = 0;
+      p.prepaid = 0;
+      p.status = "Not Paid";
+      p.notes = "";
+    });
 
-  earningsHistory.week = weekly;
-  earningsHistory.month = monthly;
-  earningsHistory.year = yearly;
+    // add finished week to month/year totals
+    earningsHistory.month += lastWeekTotal;
+    earningsHistory.year  += lastWeekTotal;
 
-  saveAllData();
-  renderEarningsPage();
-}
+    meta.weekKey = weekKeyCurrent;
+    meta.month   = monthCurrent;
+    meta.year    = yearCurrent;
 
-/**************************************************
- * RESET WEEKLY EARNINGS IF NEW WEEK STARTED
- **************************************************/
-function resetWeeklyIfNeeded() {
-  const savedWeek = localStorage.getItem("startOfWeek");
-
-  if (savedWeek !== startOfWeek.toDateString()) {
-    localStorage.setItem("startOfWeek", startOfWeek.toDateString());
-
-    // Reset weekly expected + collected
-    payments = [];
     saveAllData();
   }
 }
 
-function renderEarningsPage() {
-  document.getElementById("earnWeek").textContent = "$" + earningsHistory.week.toFixed(2);
-  document.getElementById("earnMonth").textContent = "$" + earningsHistory.month.toFixed(2);
-  document.getElementById("earnYear").textContent = "$" + earningsHistory.year.toFixed(2);
-
-  drawEarningsChart();
-}
-
-resetWeeklyIfNeeded();
-calculateEarnings();
+// run automatically when page loads
+document.addEventListener("DOMContentLoaded", () => {
+  rolloverWeekIfNeeded();
+});
