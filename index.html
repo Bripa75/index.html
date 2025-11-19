@@ -2,1266 +2,162 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Brian's Tutoring Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --bg-main: #020617;
-      --bg-panel: #020817;
-      --bg-card: #020b24;
-      --accent: #3b82f6;
-      --accent-soft: rgba(59, 130, 246, 0.25);
-      --accent-alt: #22c55e;
-      --border-subtle: rgba(148, 163, 184, 0.25);
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --radius-lg: 18px;
-      --shadow-soft: 0 0 30px rgba(15, 23, 42, 0.85);
-    }
+  <title>Brian’s Tutoring Dashboard</title>
 
-    * { box-sizing: border-box; }
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "SF Pro Text", sans-serif;
-      background: radial-gradient(circle at top left, #0b1120, #020617 50%, #000);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-    }
+  <!-- JS Data Files -->
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="payments.js" defer></script>
+  <script src="charts.js" defer></script>
 
-    /* ---- SHELL ---- */
-
-    .app-shell {
-      display: grid;
-      grid-template-columns: 240px minmax(0, 1fr);
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* ---- SIDEBAR ---- */
-
-    .sidebar {
-      background: linear-gradient(180deg, #020617, #020617, #020617);
-      border-right: 1px solid rgba(30, 64, 175, 0.7);
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .logo-block {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-orb {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 30%, #38bdf8, #3b82f6 55%, #0f172a);
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.9);
-    }
-
-    .logo-text-main {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .logo-text-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .nav-section-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .nav-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .nav-item {
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .nav-item.active {
-      background: radial-gradient(circle at 0 0, var(--accent-soft), transparent);
-      color: #f9fafb;
-      border: 1px solid var(--accent-soft);
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
-    }
-
-    .nav-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent-alt);
-      box-shadow: 0 0 16px rgba(34, 197, 94, 0.9);
-    }
-
-    .sidebar-footer {
-      margin-top: auto;
-      font-size: 11px;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(31, 41, 55, 0.9);
-      padding-top: 10px;
-    }
-
-    .sidebar-footer span {
-      color: var(--text-main);
-    }
-
-    /* ---- MAIN PANEL ---- */
-
-    .main-panel {
-      padding: 18px 22px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      overflow: hidden;
-    }
-
-    .main-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .main-title-block h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: 0.02em;
-    }
-
-    .main-subtitle {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .pill-dot-live {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 14px rgba(34, 197, 94, 0.9);
-    }
-
-    /* ---- TOP STATS ---- */
-
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .stat-card {
-      background: radial-gradient(circle at 0 0, var(--accent-soft), #020617);
-      border-radius: var(--radius-lg);
-      padding: 10px 14px;
-      border: 1px solid rgba(37, 99, 235, 0.7);
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .stat-card:nth-child(2) {
-      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.22), #020617);
-      border-color: rgba(56, 189, 248, 0.7);
-    }
-
-    .stat-card:nth-child(3) {
-      background: radial-gradient(circle at 0 0, rgba(16, 185, 129, 0.3), #020617);
-      border-color: rgba(16, 185, 129, 0.8);
-    }
-
-    .stat-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: rgba(209, 213, 219, 0.9);
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .stat-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    /* ---- MAIN GRID ---- */
-
-    .grid-main {
-      display: grid;
-      grid-template-columns: 1.3fr 1.2fr 1.4fr;
-      gap: 12px;
-      height: 100%;
-      min-height: 0;
-    }
-
-    .card {
-      background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.18), #020617);
-      border-radius: var(--radius-lg);
-      padding: 12px 14px;
-      border: 1px solid var(--border-subtle);
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 6px;
-    }
-
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .card-subtitle {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .table-wrapper {
-      margin-top: 4px;
-      flex: 1;
-      overflow: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      color: var(--text-main);
-    }
-
-    thead {
-      position: sticky;
-      top: 0;
-      background: rgba(15, 23, 42, 0.96);
-      backdrop-filter: blur(10px);
-      z-index: 1;
-    }
-
-    th, td {
-      padding: 6px 5px;
-      border-bottom: 1px solid rgba(31, 41, 55, 0.8);
-    }
-
-    th {
-      text-align: left;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-    }
-
-    tbody tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.7);
-    }
-
-    tbody tr:hover {
-      background: rgba(37, 99, 235, 0.2);
-    }
-
-    .btn-sm {
-      font-size: 11px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.8);
-      background: rgba(15, 23, 42, 0.9);
-      color: #e5e7eb;
-      cursor: pointer;
-      margin-right: 4px;
-    }
-
-    .btn-sm.save {
-      border-color: rgba(34, 197, 94, 0.9);
-      color: #bbf7d0;
-    }
-
-    .btn-sm.delete {
-      border-color: rgba(239, 68, 68, 0.9);
-      color: #fecaca;
-    }
-
-    .btn-add {
-      margin-top: 6px;
-      align-self: flex-start;
-      font-size: 11px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      border: 1px dashed rgba(148, 163, 184, 0.8);
-      background: rgba(15, 23, 42, 0.9);
-      color: #e5e7eb;
-      cursor: pointer;
-    }
-
-    /* ---- REVENUE CARD ---- */
-
-    .revenue-metrics {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 3px;
-      margin-bottom: 4px;
-    }
-
-    .revenue-metrics strong {
-      color: var(--text-main);
-    }
-
-    #revenueChart {
-      width: 100%;
-      height: 190px;
-      border-radius: 12px;
-      background: radial-gradient(circle at 0 0, rgba(37, 99, 235, 0.24), #020617);
-      box-shadow: 0 0 28px rgba(37, 99, 235, 0.6);
-      margin-bottom: 4px;
-    }
-
-    .owe-list {
-      margin-top: 4px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .owe-list strong { color: #fecaca; }
-
-    input[type="text"], input[type="number"], select {
-      background: rgba(15, 23, 42, 0.95);
-      color: #e5e7eb;
-      border-radius: 8px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      padding: 3px 6px;
-      font-size: 11px;
-      width: 100%;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: rgba(59, 130, 246, 0.9);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.7);
-    }
-
-    @media (max-width: 1050px) {
-      .app-shell { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-      .grid-main { grid-template-columns: 1fr; }
-      .stat-row { grid-template-columns: 1fr; }
-    }
-  </style>
+  <!-- ChartJS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-  <div class="app-shell">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="logo-block">
-        <div class="logo-orb"></div>
-        <div>
-          <div class="logo-text-main">Ripa Elevate Dashboard</div>
-          <div class="logo-text-sub">Private tutoring control center</div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>📚 Dashboard</h2>
+    <ul>
+      <li class="active" onclick="showPage('overview')">Overview</li>
+      <li onclick="showPage('students')">Students</li>
+      <li onclick="showPage('schedule')">Schedule</li>
+      <li onclick="showPage('payments')">Payments</li>
+      <li onclick="showPage('earnings')">Earnings</li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- ================= OVERVIEW ================= -->
+    <section id="overview" class="page active">
+      <h1>Overview</h1>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Total Students</h3>
+          <p id="totalStudents">0</p>
+        </div>
+
+        <div class="card">
+          <h3>This Week's Expected</h3>
+          <p id="weekExpected">$0</p>
+        </div>
+
+        <div class="card">
+          <h3>This Week's Collected</h3>
+          <p id="weekCollected">$0</p>
+        </div>
+
+        <div class="card">
+          <h3>This Week's Outstanding</h3>
+          <p id="weekOutstanding">$0</p>
         </div>
       </div>
 
-      <div>
-        <div class="nav-section-title">Overview</div>
-        <ul class="nav-list">
-          <li class="nav-item active">
-            <span class="nav-dot"></span> Business Overview
-          </li>
-          <li class="nav-item">Students</li>
-          <li class="nav-item">Schedule</li>
-          <li class="nav-item">Payments</li>
-          <li class="nav-item">Goals</li>
-        </ul>
+      <div class="chart-container">
+        <canvas id="studentsChart"></canvas>
       </div>
 
-      <div class="sidebar-footer">
-        Data is stored locally in your browser.<br />
-        <span>No login, no server, just for Brian.</span>
+      <div class="chart-container">
+        <canvas id="hoursChart"></canvas>
       </div>
-    </aside>
+    </section>
 
-    <!-- MAIN PANEL -->
-    <main class="main-panel">
-      <header class="main-header">
-        <div class="main-title-block">
-          <h1>Business Overview</h1>
-          <div class="main-subtitle">
-            Track students, schedule, and Zelle payments in one clean place.
-          </div>
+    <!-- ================= STUDENTS ================= -->
+    <section id="students" class="page">
+      <h1>Students</h1>
+
+      <button class="add-btn" onclick="addStudentRow()">+ Add Student</button>
+
+      <table class="main-table" id="studentsTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Grade</th>
+            <th>Rate ($/hr)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- ================= SCHEDULE ================= -->
+    <section id="schedule" class="page">
+      <h1>Weekly Schedule</h1>
+
+      <button class="add-btn" onclick="addScheduleRow()">+ Add Session</button>
+
+      <table class="main-table" id="scheduleTable">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Student</th>
+            <th>Time</th>
+            <th>Duration (hr)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- ================= PAYMENTS ================= -->
+    <section id="payments" class="page">
+      <h1>Payments</h1>
+
+      <table class="main-table" id="paymentsTable">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Expected</th>
+            <th>Paid</th>
+            <th>Prepaid</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- ================= EARNINGS ================= -->
+    <section id="earnings" class="page">
+      <h1>Earnings</h1>
+
+      <div class="grid">
+        <div class="card">
+          <h3>This Week</h3>
+          <p id="earnWeek">$0</p>
         </div>
-        <div style="text-align:right;">
-          <div class="pill">
-            <span class="pill-dot-live"></span>
-            This week: <span id="weekRangeLabel"></span>
-          </div>
+
+        <div class="card">
+          <h3>This Month</h3>
+          <p id="earnMonth">$0</p>
         </div>
-      </header>
 
-      <!-- TOP STATS -->
-      <section class="stat-row">
-        <article class="stat-card">
-          <div class="stat-label">Active Students</div>
-          <div class="stat-value" id="statActiveStudents">0</div>
-          <div class="stat-sub" id="statGradeMix">Grade mix loading…</div>
-        </article>
+        <div class="card">
+          <h3>This Year</h3>
+          <p id="earnYear">$0</p>
+        </div>
+      </div>
 
-        <article class="stat-card">
-          <div class="stat-label">Weekly Teaching Hours</div>
-          <div class="stat-value" id="statWeeklyHours">0 hrs</div>
-          <div class="stat-sub" id="statSessionsPerWeek">Sessions per week: —</div>
-        </article>
+      <div class="chart-container">
+        <canvas id="earningsChart"></canvas>
+      </div>
+    </section>
 
-        <article class="stat-card">
-          <div class="stat-label">Revenue Snapshot</div>
-          <div class="stat-value" id="statWeeklyRevenue">$0.00</div>
-          <div class="stat-sub" id="statMonthYearLabel">Month &amp; year totals loading…</div>
-        </article>
-      </section>
+  </main>
 
-      <!-- MAIN GRID -->
-      <section class="grid-main">
-        <!-- STUDENTS -->
-        <article class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Students</div>
-              <div class="card-subtitle">Name, grade, and hourly rate (or flat).</div>
-            </div>
-          </div>
-          <div class="table-wrapper">
-            <table id="studentsTable">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Grade</th>
-                  <th>Rate</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <button class="btn-add" id="addStudentBtn">+ Add student</button>
-        </article>
-
-        <!-- SCHEDULE -->
-        <article class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Weekly Schedule</div>
-              <div class="card-subtitle">Recurring sessions by day.</div>
-            </div>
-          </div>
-          <div class="table-wrapper">
-            <table id="scheduleTable">
-              <thead>
-                <tr>
-                  <th>Day</th>
-                  <th>Student</th>
-                  <th>Time</th>
-                  <th>Duration</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <button class="btn-add" id="addSessionBtn">+ Add session</button>
-        </article>
-
-        <!-- REVENUE + PAYMENTS -->
-        <article class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Payments &amp; Revenue</div>
-              <div class="card-subtitle">Inline payments per student (this week).</div>
-            </div>
-          </div>
-
-          <div class="revenue-metrics">
-            <span id="weeklyExpected"></span>
-            <span id="weeklyCollected"></span>
-            <span id="weeklyOutstanding"></span>
-          </div>
-
-          <canvas id="revenueChart"></canvas>
-
-          <div class="owe-list" id="oweList"></div>
-
-          <div class="table-wrapper" style="margin-top:6px; max-height:180px;">
-            <table id="paymentsTable">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Expected</th>
-                  <th>Paid</th>
-                  <th>Prepaid</th>
-                  <th>Status</th>
-                  <th>Notes</th>
-                  <th>Save</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </article>
-      </section>
-    </main>
-  </div>
-
-  <script>
-    // ===================== DATA & STORAGE =====================
-
-    const KEY_STUDENTS = "tutoring_students_v3";
-    const KEY_SCHEDULE = "tutoring_schedule_v3";
-    const KEY_PAYMENTS = "tutoring_payments_v3";
-
-    const defaultStudents = [
-      { id: "diana",   name: "Diana",   grade: "4th",    rate: 40 },
-      { id: "lucas",   name: "Lucas",   grade: "6th",    rate: 45 },
-      { id: "eva",     name: "Eva",     grade: "4th",    rate: 27 }, // flat 40-min
-      { id: "milana",  name: "Milana",  grade: "4th",    rate: 45 },
-      { id: "leo",     name: "Leo",     grade: "1st",    rate: 30 },
-      { id: "steph",   name: "Stephanie", grade: "4th",  rate: 35 },
-      { id: "gabriel", name: "Gabriel", grade: "College", rate: 60 },
-      { id: "maksim",  name: "Maksim",  grade: "7th",    rate: 65 },
-      { id: "savion",  name: "Savion",  grade: "College", rate: 60 },
-      { id: "eric",    name: "Eric",    grade: "College", rate: 75 },
-      { id: "timothy", name: "Timothy", grade: "4th",    rate: 60 },
-    ];
-
-    const defaultSchedule = [
-      { id: "mon-diana", day: "Monday",   studentId: "diana",   time: "6:30 – 7:30 pm", durationHours: 1 },
-      { id: "tue-eva",   day: "Tuesday",  studentId: "eva",     time: "4:20 – 5:00 pm", durationHours: 40/60 },
-      { id: "tue-lucas", day: "Tuesday",  studentId: "lucas",   time: "5:00 – 6:00 pm", durationHours: 1 },
-      { id: "tue-tim",   day: "Tuesday",  studentId: "timothy", time: "7:00 – 8:00 pm", durationHours: 1 },
-      { id: "thu-leo",   day: "Thursday", studentId: "leo",     time: "3:00 – 4:00 pm", durationHours: 1 },
-      { id: "thu-lucas", day: "Thursday", studentId: "lucas",   time: "5:00 – 6:00 pm", durationHours: 1 },
-      { id: "thu-steph", day: "Thursday", studentId: "steph",   time: "6:00 – 7:00 pm", durationHours: 1 },
-      { id: "fri-sav",   day: "Friday",   studentId: "savion",  time: "(time TBD)",      durationHours: 1 },
-      { id: "fri-gab",   day: "Friday",   studentId: "gabriel", time: "1:00 – 2:00 pm (Calc)", durationHours: 1, rateOverride: 60 },
-      { id: "fri-leo",   day: "Friday",   studentId: "leo",     time: "3:00 – 4:00 pm",  durationHours: 1 },
-      { id: "fri-diana", day: "Friday",   studentId: "diana",   time: "4:00 – 5:00 pm",  durationHours: 1 },
-      { id: "fri-maks",  day: "Friday",   studentId: "maksim",  time: "5:00 – 6:00 pm",  durationHours: 1 },
-      { id: "sat-mil",   day: "Saturday", studentId: "milana",  time: "11:00 – 12:00 pm",durationHours: 1 },
-      { id: "sun-maks",  day: "Sunday",   studentId: "maksim",  time: "10:00 – 11:00 am",durationHours: 1 },
-      { id: "sun-eric",  day: "Sunday",   studentId: "eric",    time: "11:00 – 12:00 pm",durationHours: 1 },
-      { id: "sun-gab-h", day: "Sunday",   studentId: "gabriel", time: "12:00 – 1:00 pm (History)", durationHours: 1, rateOverride: 85 },
-    ];
-
-    let students = [];
-    let schedule = [];
-    // payments[weekKey][studentId] = { expected, paid, prepaid, status, notes }
-    let payments = {};
-
-    function loadAll() {
-      try {
-        const s = localStorage.getItem(KEY_STUDENTS);
-        const sch = localStorage.getItem(KEY_SCHEDULE);
-        const pay = localStorage.getItem(KEY_PAYMENTS);
-        students = s ? JSON.parse(s) : structuredClone(defaultStudents);
-        schedule = sch ? JSON.parse(sch) : structuredClone(defaultSchedule);
-        payments = pay ? JSON.parse(pay) : {};
-      } catch (e) {
-        console.error("Error loading data, using defaults", e);
-        students = structuredClone(defaultStudents);
-        schedule = structuredClone(defaultSchedule);
-        payments = {};
-      }
-    }
-
-    function saveAll() {
-      localStorage.setItem(KEY_STUDENTS, JSON.stringify(students));
-      localStorage.setItem(KEY_SCHEDULE, JSON.stringify(schedule));
-      localStorage.setItem(KEY_PAYMENTS, JSON.stringify(payments));
-    }
-
-    // ===================== DATE HELPERS =====================
-
-    function getMondayStart(date) {
-      const d = new Date(date);
-      const day = d.getDay(); // 0 Sun
-      const diff = (day === 0 ? -6 : 1) - day;
-      d.setDate(d.getDate() + diff);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    }
-
-    function formatKey(d) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    }
-
-    function getWeekKey() {
-      return formatKey(getMondayStart(new Date()));
-    }
-
-    function getWeekRangeLabel() {
-      const monday = getMondayStart(new Date());
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-
-      const opt = { month: "short", day: "numeric" };
-      return `${monday.toLocaleDateString(undefined, opt)} – ${sunday.toLocaleDateString(undefined, opt)}`;
-    }
-
-    // ===================== CORE HELPERS =====================
-
-    function getStudentById(id) {
-      return students.find(s => s.id === id);
-    }
-
-    function computeExpectedForStudent(studentId) {
-      const st = getStudentById(studentId);
-      if (!st) return 0;
-      let total = 0;
-      for (const sess of schedule) {
-        if (sess.studentId !== studentId) continue;
-        if (studentId === "eva") {
-          total += 27; // flat per 40-min
-        } else {
-          const rate = sess.rateOverride != null ? sess.rateOverride : st.rate;
-          const hours = sess.durationHours || 1;
-          total += rate * hours;
-        }
-      }
-      return total;
-    }
-
-    function computeWeeklyTotals() {
-      const key = getWeekKey();
-      const weekRecs = payments[key] || {};
-
-      let expectedTotal = 0;
-      let collectedTotal = 0;
-
-      for (const st of students) {
-        const exp = computeExpectedForStudent(st.id);
-        expectedTotal += exp;
-        const rec = weekRecs[st.id] || {};
-        const paid = Number(rec.paid || 0);
-        const prepaid = Number(rec.prepaid || 0);
-        collectedTotal += paid + prepaid;
-      }
-      return {
-        expected: expectedTotal,
-        collected: collectedTotal,
-        outstanding: Math.max(0, expectedTotal - collectedTotal)
-      };
-    }
-
-    function computeMonthYearTotals() {
-      const now = new Date();
-      const thisMonth = now.getMonth();
-      const thisYear = now.getFullYear();
-
-      let monthExpected = 0, monthCollected = 0;
-      let yearExpected = 0, yearCollected = 0;
-
-      for (const [weekKey, recs] of Object.entries(payments)) {
-        const d = new Date(weekKey);
-        if (isNaN(d)) continue;
-
-        let weekExpected = 0, weekCollected = 0;
-
-        for (const [studentId, r] of Object.entries(recs)) {
-          const exp = Number(r.expected || computeExpectedForStudent(studentId));
-          const paid = Number(r.paid || 0);
-          const prepaid = Number(r.prepaid || 0);
-          weekExpected += exp;
-          weekCollected += paid + prepaid;
-        }
-
-        if (d.getFullYear() === thisYear) {
-          yearExpected += weekExpected;
-          yearCollected += weekCollected;
-          if (d.getMonth() === thisMonth) {
-            monthExpected += weekExpected;
-            monthCollected += weekCollected;
-          }
-        }
-      }
-      return {
-        monthExpected,
-        monthCollected,
-        monthOutstanding: Math.max(0, monthExpected - monthCollected),
-        yearExpected,
-        yearCollected,
-        yearOutstanding: Math.max(0, yearExpected - yearCollected)
-      };
-    }
-
-    function computeWeeklyHoursAndSessions() {
-      let hrs = 0;
-      for (const sess of schedule) {
-        hrs += sess.durationHours || 1;
-      }
-      return { hours: hrs, sessions: schedule.length };
-    }
-
-    // ===================== RENDER: STUDENTS =====================
-
-    function renderStudentsTable() {
-      const tbody = document.querySelector("#studentsTable tbody");
-      tbody.innerHTML = "";
-
-      students.forEach(st => {
-        const tr = document.createElement("tr");
-        tr.dataset.id = st.id;
-
-        const tdName = document.createElement("td");
-        const tdGrade = document.createElement("td");
-        const tdRate = document.createElement("td");
-        const tdActions = document.createElement("td");
-
-        tdName.textContent = st.name;
-        tdGrade.textContent = st.grade;
-        tdRate.textContent = st.id === "eva" ? "$27 / 40 min" : `$${st.rate.toFixed(2)}/hr`;
-
-        const btnEdit = document.createElement("button");
-        btnEdit.textContent = "Edit";
-        btnEdit.className = "btn-sm";
-        btnEdit.onclick = () => editStudentRow(tr, st.id);
-
-        const btnDel = document.createElement("button");
-        btnDel.textContent = "Delete";
-        btnDel.className = "btn-sm delete";
-        btnDel.onclick = () => deleteStudent(st.id);
-
-        tdActions.appendChild(btnEdit);
-        tdActions.appendChild(btnDel);
-
-        tr.appendChild(tdName);
-        tr.appendChild(tdGrade);
-        tr.appendChild(tdRate);
-        tr.appendChild(tdActions);
-        tbody.appendChild(tr);
-      });
-
-      // summary
-      const gradeCounts = {};
-      for (const s of students) {
-        gradeCounts[s.grade] = (gradeCounts[s.grade] || 0) + 1;
-      }
-      const mix = Object.entries(gradeCounts).map(([g, c]) => `${g}: ${c}`).join(" • ");
-      document.getElementById("statGradeMix").textContent = mix || "No students.";
-      document.getElementById("statActiveStudents").textContent = students.length;
-    }
-
-    function editStudentRow(tr, id) {
-      const st = getStudentById(id);
-      if (!st) return;
-      tr.innerHTML = "";
-
-      // name
-      const tdName = document.createElement("td");
-      const inpName = document.createElement("input");
-      inpName.type = "text";
-      inpName.value = st.name;
-      tdName.appendChild(inpName);
-
-      // grade
-      const tdGrade = document.createElement("td");
-      const inpGrade = document.createElement("input");
-      inpGrade.type = "text";
-      inpGrade.value = st.grade;
-      tdGrade.appendChild(inpGrade);
-
-      // rate
-      const tdRate = document.createElement("td");
-      const inpRate = document.createElement("input");
-      inpRate.type = "number";
-      inpRate.step = "1";
-      inpRate.value = st.rate;
-      tdRate.appendChild(inpRate);
-
-      const tdActions = document.createElement("td");
-      const btnSave = document.createElement("button");
-      btnSave.textContent = "Save";
-      btnSave.className = "btn-sm save";
-      btnSave.onclick = () => {
-        st.name = inpName.value.trim() || st.name;
-        st.grade = inpGrade.value.trim() || st.grade;
-        const newRate = Number(inpRate.value);
-        if (!Number.isNaN(newRate) && newRate > 0) st.rate = newRate;
-        saveAll();
-        renderAll();
-      };
-      const btnCancel = document.createElement("button");
-      btnCancel.textContent = "Cancel";
-      btnCancel.className = "btn-sm";
-      btnCancel.onclick = () => renderAll();
-
-      tdActions.appendChild(btnSave);
-      tdActions.appendChild(btnCancel);
-
-      tr.appendChild(tdName);
-      tr.appendChild(tdGrade);
-      tr.appendChild(tdRate);
-      tr.appendChild(tdActions);
-    }
-
-    function deleteStudent(id) {
-      if (!confirm("Delete this student and related schedule & payments?")) return;
-      students = students.filter(s => s.id !== id);
-      schedule = schedule.filter(sess => sess.studentId !== id);
-      for (const wk of Object.values(payments)) {
-        if (wk[id]) delete wk[id];
-      }
-      saveAll();
-      renderAll();
-    }
-
-    function addNewStudent() {
-      const name = prompt("Student name:");
-      if (!name) return;
-      const grade = prompt("Grade (e.g. 4th, 6th, College):") || "Unknown";
-      const rateStr = prompt("Rate ($/hr, number):", "40");
-      const rate = Number(rateStr || 0);
-      const id = "s" + Date.now();
-      students.push({ id, name: name.trim(), grade: grade.trim(), rate: rate || 0 });
-      saveAll();
-      renderAll();
-    }
-
-    // ===================== RENDER: SCHEDULE =====================
-
-    function renderScheduleTable() {
-      const tbody = document.querySelector("#scheduleTable tbody");
-      tbody.innerHTML = "";
-
-      const order = {
-        Monday: 1, Tuesday: 2, Wednesday: 3,
-        Thursday: 4, Friday: 5, Saturday: 6, Sunday: 7
-      };
-
-      const sorted = [...schedule].sort(
-        (a, b) => (order[a.day] || 99) - (order[b.day] || 99)
-      );
-
-      sorted.forEach(sess => {
-        const tr = document.createElement("tr");
-        tr.dataset.id = sess.id;
-
-        const st = getStudentById(sess.studentId);
-
-        const tdDay = document.createElement("td");
-        const tdName = document.createElement("td");
-        const tdTime = document.createElement("td");
-        const tdDur = document.createElement("td");
-        const tdActions = document.createElement("td");
-
-        tdDay.textContent = sess.day;
-        tdName.textContent = st ? st.name : "(deleted)";
-        tdTime.textContent = sess.time;
-        tdDur.textContent = (sess.durationHours || 1).toFixed(2) + " hr";
-
-        const btnEdit = document.createElement("button");
-        btnEdit.textContent = "Edit";
-        btnEdit.className = "btn-sm";
-        btnEdit.onclick = () => editSessionRow(tr, sess.id);
-
-        const btnDel = document.createElement("button");
-        btnDel.textContent = "Delete";
-        btnDel.className = "btn-sm delete";
-        btnDel.onclick = () => deleteSession(sess.id);
-
-        tdActions.appendChild(btnEdit);
-        tdActions.appendChild(btnDel);
-
-        tr.appendChild(tdDay);
-        tr.appendChild(tdName);
-        tr.appendChild(tdTime);
-        tr.appendChild(tdDur);
-        tr.appendChild(tdActions);
-        tbody.appendChild(tr);
-      });
-
-      const { hours, sessions } = computeWeeklyHoursAndSessions();
-      document.getElementById("statWeeklyHours").textContent = hours.toFixed(2) + " hrs";
-      document.getElementById("statSessionsPerWeek").textContent = "Sessions per week: " + sessions;
-    }
-
-    function editSessionRow(tr, id) {
-      const sess = schedule.find(s => s.id === id);
-      if (!sess) return;
-
-      tr.innerHTML = "";
-
-      const tdDay = document.createElement("td");
-      const inpDay = document.createElement("input");
-      inpDay.type = "text";
-      inpDay.value = sess.day;
-      tdDay.appendChild(inpDay);
-
-      const tdName = document.createElement("td");
-      const selectStudent = document.createElement("select");
-      students.forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s.id;
-        opt.textContent = s.name;
-        if (s.id === sess.studentId) opt.selected = true;
-        selectStudent.appendChild(opt);
-      });
-      tdName.appendChild(selectStudent);
-
-      const tdTime = document.createElement("td");
-      const inpTime = document.createElement("input");
-      inpTime.type = "text";
-      inpTime.value = sess.time;
-      tdTime.appendChild(inpTime);
-
-      const tdDur = document.createElement("td");
-      const inpDur = document.createElement("input");
-      inpDur.type = "number";
-      inpDur.step = "0.25";
-      inpDur.value = sess.durationHours || 1;
-      tdDur.appendChild(inpDur);
-
-      const tdActions = document.createElement("td");
-      const btnSave = document.createElement("button");
-      btnSave.textContent = "Save";
-      btnSave.className = "btn-sm save";
-      btnSave.onclick = () => {
-        sess.day = inpDay.value.trim() || sess.day;
-        sess.studentId = selectStudent.value;
-        sess.time = inpTime.value.trim() || sess.time;
-        const dur = Number(inpDur.value);
-        if (!Number.isNaN(dur) && dur > 0) sess.durationHours = dur;
-        saveAll();
-        renderAll();
-      };
-      const btnCancel = document.createElement("button");
-      btnCancel.textContent = "Cancel";
-      btnCancel.className = "btn-sm";
-      btnCancel.onclick = () => renderAll();
-
-      tdActions.appendChild(btnSave);
-      tdActions.appendChild(btnCancel);
-
-      tr.appendChild(tdDay);
-      tr.appendChild(tdName);
-      tr.appendChild(tdTime);
-      tr.appendChild(tdDur);
-      tr.appendChild(tdActions);
-    }
-
-    function deleteSession(id) {
-      if (!confirm("Delete this session?")) return;
-      schedule = schedule.filter(s => s.id !== id);
-      saveAll();
-      renderAll();
-    }
-
-    function addNewSession() {
-      const day = prompt("Day (e.g. Monday, Tuesday):", "Monday");
-      if (!day) return;
-      if (!students.length) {
-        alert("Add at least one student first.");
-        return;
-      }
-
-      const studentNameList = students.map(s => s.name).join(", ");
-      const studentName = prompt("Which student? (type their name)\n" + studentNameList, students[0].name);
-      if (!studentName) return;
-      const st = students.find(s => s.name.toLowerCase() === studentName.toLowerCase());
-      if (!st) {
-        alert("No student found with that name.");
-        return;
-      }
-
-      const time = prompt("Time (e.g. 3:00 – 4:00 pm):", "3:00 – 4:00 pm") || "";
-      const durStr = prompt("Duration in hours (e.g. 1, 0.67):", "1");
-      const dur = Number(durStr || 1);
-
-      const id = "sess-" + Date.now();
-      schedule.push({ id, day: day.trim(), studentId: st.id, time: time.trim(), durationHours: dur || 1 });
-      saveAll();
-      renderAll();
-    }
-
-    // ===================== PAYMENTS & REVENUE =====================
-
-    function renderPaymentsTable() {
-      const tbody = document.querySelector("#paymentsTable tbody");
-      tbody.innerHTML = "";
-
-      const weekKey = getWeekKey();
-      const weekRecs = payments[weekKey] || {};
-
-      students.forEach(st => {
-        const expected = computeExpectedForStudent(st.id);
-        if (expected <= 0) return;
-
-        const rec = weekRecs[st.id] || {};
-        const tr = document.createElement("tr");
-        tr.dataset.id = st.id;
-
-        // student
-        const tdName = document.createElement("td");
-        tdName.textContent = st.name;
-
-        // expected
-        const tdExp = document.createElement("td");
-        tdExp.textContent = "$" + expected.toFixed(2);
-
-        // paid
-        const tdPaid = document.createElement("td");
-        const inpPaid = document.createElement("input");
-        inpPaid.type = "number";
-        inpPaid.step = "1";
-        inpPaid.value = rec.paid ?? "";
-        tdPaid.appendChild(inpPaid);
-
-        // prepaid
-        const tdPre = document.createElement("td");
-        const inpPre = document.createElement("input");
-        inpPre.type = "number";
-        inpPre.step = "1";
-        inpPre.value = rec.prepaid ?? "";
-        tdPre.appendChild(inpPre);
-
-        // status
-        const tdStatus = document.createElement("td");
-        const selStatus = document.createElement("select");
-        ["notpaid","partial","paid"].forEach(val => {
-          const opt = document.createElement("option");
-          opt.value = val;
-          opt.textContent = val;
-          if ((rec.status || "notpaid") === val) opt.selected = true;
-          selStatus.appendChild(opt);
-        });
-        tdStatus.appendChild(selStatus);
-
-        // notes
-        const tdNotes = document.createElement("td");
-        const inpNotes = document.createElement("input");
-        inpNotes.type = "text";
-        inpNotes.value = rec.notes || "";
-        tdNotes.appendChild(inpNotes);
-
-        // save btn
-        const tdSave = document.createElement("td");
-        const btnSave = document.createElement("button");
-        btnSave.textContent = "Save";
-        btnSave.className = "btn-sm save";
-        btnSave.onclick = () => {
-          const paid = Number(inpPaid.value || 0);
-          const prepaid = Number(inpPre.value || 0);
-          const status = selStatus.value;
-          const notes = inpNotes.value;
-
-          if (!payments[weekKey]) payments[weekKey] = {};
-          payments[weekKey][st.id] = {
-            expected,
-            paid,
-            prepaid,
-            status,
-            notes
-          };
-          saveAll();
-          renderRevenueSummary();
-          renderOweList();
-          drawRevenueChart();
-        };
-        tdSave.appendChild(btnSave);
-
-        tr.appendChild(tdName);
-        tr.appendChild(tdExp);
-        tr.appendChild(tdPaid);
-        tr.appendChild(tdPre);
-        tr.appendChild(tdStatus);
-        tr.appendChild(tdNotes);
-        tr.appendChild(tdSave);
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderRevenueSummary() {
-      const weekTotals = computeWeeklyTotals();
-      const myTotals = computeMonthYearTotals();
-
-      document.getElementById("statWeeklyRevenue").textContent =
-        "$" + weekTotals.expected.toFixed(2);
-      document.getElementById("statMonthYearLabel").textContent =
-        `Collected this month: $${myTotals.monthCollected.toFixed(2)} • Year: $${myTotals.yearCollected.toFixed(2)}`;
-
-      const weeklyExpectedEl = document.getElementById("weeklyExpected");
-      const weeklyCollectedEl = document.getElementById("weeklyCollected");
-      const weeklyOutstandingEl = document.getElementById("weeklyOutstanding");
-
-      weeklyExpectedEl.innerHTML = `<strong>Expected this week:</strong> $${weekTotals.expected.toFixed(2)}`;
-      weeklyCollectedEl.innerHTML =
-        `<strong>Collected this week:</strong> $${weekTotals.collected.toFixed(2)} (month: $${myTotals.monthCollected.toFixed(2)}, year: $${myTotals.yearCollected.toFixed(2)})`;
-      weeklyOutstandingEl.innerHTML =
-        `<strong>Outstanding this week:</strong> $${weekTotals.outstanding.toFixed(2)} (month: $${myTotals.monthOutstanding.toFixed(2)}, year: $${myTotals.yearOutstanding.toFixed(2)})`;
-    }
-
-    function renderOweList() {
-      const key = getWeekKey();
-      const weekRecs = payments[key] || {};
-      const list = [];
-
-      for (const st of students) {
-        const expected = computeExpectedForStudent(st.id);
-        if (expected <= 0) continue;
-        const rec = weekRecs[st.id] || {};
-        const paid = Number(rec.paid || 0) + Number(rec.prepaid || 0);
-        const owed = expected - paid;
-        if (owed > 0.01) {
-          list.push({ name: st.name, owed });
-        }
-      }
-
-      const el = document.getElementById("oweList");
-      if (!list.length) {
-        el.innerHTML = "<strong>Everyone is fully paid for this week 🎉</strong>";
-      } else {
-        el.innerHTML = "Still owes this week → " +
-          list.map(x => `${x.name}: <strong>$${x.owed.toFixed(2)}</strong>`).join(" • ");
-      }
-    }
-
-    // ===================== SIMPLE BAR CHART =====================
-
-    function drawRevenueChart() {
-      const canvas = document.getElementById("revenueChart");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-
-      const w = canvas.clientWidth || 320;
-      const h = canvas.clientHeight || 190;
-      canvas.width = w;
-      canvas.height = h;
-
-      ctx.clearRect(0, 0, w, h);
-
-      const data = students
-        .map(st => ({
-          name: st.name,
-          value: computeExpectedForStudent(st.id)
-        }))
-        .filter(x => x.value > 0);
-
-      if (!data.length) {
-        ctx.fillStyle = "#9ca3af";
-        ctx.font = "12px system-ui";
-        ctx.fillText("No revenue data yet.", 14, 24);
-        return;
-      }
-
-      const maxVal = Math.max(...data.map(d => d.value), 20);
-      const padding = 30;
-      const barWidth = (w - padding * 2) / data.length;
-
-      // axes
-      ctx.strokeStyle = "rgba(148,163,184,0.6)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(padding, padding);
-      ctx.lineTo(padding, h - padding);
-      ctx.lineTo(w - padding, h - padding);
-      ctx.stroke();
-
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, "#3b82f6");
-      grad.addColorStop(1, "#22c55e");
-
-      data.forEach((d, i) => {
-        const x = padding + i * barWidth + barWidth * 0.2;
-        const barHeight = (d.value / maxVal) * (h - padding * 2 - 10);
-        const y = h - padding - barHeight;
-
-        ctx.shadowColor = "rgba(59,130,246,0.9)";
-        ctx.shadowBlur = 16;
-        ctx.fillStyle = grad;
-        ctx.fillRect(x, y, barWidth * 0.6, barHeight);
-
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "#e5e7eb";
-        ctx.font = "10px system-ui";
-        ctx.textAlign = "center";
-        ctx.fillText(d.name, x + barWidth * 0.3, h - padding + 12);
-
-        ctx.fillStyle = "#9ca3af";
-        ctx.font = "9px system-ui";
-        ctx.fillText("$" + d.value.toFixed(0), x + barWidth * 0.3, y - 4);
-      });
-    }
-
-    // ===================== RENDER ALL =====================
-
-    function renderAll() {
-      document.getElementById("weekRangeLabel").textContent = getWeekRangeLabel();
-      renderStudentsTable();
-      renderScheduleTable();
-      renderPaymentsTable();
-      renderRevenueSummary();
-      renderOweList();
-      drawRevenueChart();
-    }
-
-    // ===================== INIT =====================
-
-    document.addEventListener("DOMContentLoaded", () => {
-      loadAll();
-      renderAll();
-
-      document.getElementById("addStudentBtn").addEventListener("click", addNewStudent);
-      document.getElementById("addSessionBtn").addEventListener("click", addNewSession);
-      window.addEventListener("resize", drawRevenueChart);
-    });
-  </script>
 </body>
 </html>
+
 
