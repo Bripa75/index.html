@@ -1,0 +1,227 @@
+/* ===========================
+   GLOBAL THEME + RESET
+=========================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+  background: #0b0f19;
+  color: white;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+.sidebar {
+  width: 240px;
+  background: #0e1525;
+  padding: 20px;
+  border-right: 1px solid #1a2235;
+  height: 100vh;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #7ab8ff;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  padding: 12px;
+  margin-bottom: 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  color: #c7d7ff;
+}
+
+.sidebar li:hover {
+  background: #1a2235;
+}
+
+.sidebar li.active {
+  background: #265dff;
+  color: white;
+}
+
+/* ===========================
+   MAIN AREA
+=========================== */
+
+main {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+/* ===========================
+   CARDS
+=========================== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: #111827;
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+  box-shadow: 0 0 20px rgba(30, 70, 190, 0.15);
+}
+
+.card h3 {
+  margin-bottom: 10px;
+  color: #78aaff;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+.add-btn {
+  background: #2563eb;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 16px;
+  transition: 0.2s;
+}
+
+.add-btn:hover {
+  background: #1e4fcc;
+}
+
+/* ===========================
+   TABLES
+=========================== */
+
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #0e1525;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #1a2235;
+}
+
+.main-table th {
+  background: #1a2235;
+  padding: 14px;
+  text-align: left;
+  font-size: 14px;
+  color: #90a8ff;
+}
+
+.main-table td {
+  padding: 12px;
+  border-bottom: 1px solid #1f2937;
+  font-size: 15px;
+}
+
+.main-table tr:hover {
+  background: #162035;
+}
+
+.action-btn {
+  background: #3b82f6;
+  padding: 6px 12px;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+.action-btn.delete {
+  background: #dc2626;
+}
+
+/* ===========================
+   CHART AREA
+=========================== */
+
+.chart-container {
+  background: #111827;
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+  margin-bottom: 25px;
+  box-shadow: 0 0 20px rgba(30, 70, 190, 0.15);
+}
+
+canvas {
+  width: 100% !important;
+  height: 330px !important;
+}
+
+/* ===========================
+   INPUT FIELDS FOR INLINE EDITING
+=========================== */
+
+.table-input {
+  width: 100%;
+  background: #1a2235;
+  border: 1px solid #334155;
+  padding: 8px;
+  border-radius: 6px;
+  color: white;
+}
+
+.table-input:focus {
+  outline: 2px solid #3b82f6;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    width: 180px;
+  }
+}
